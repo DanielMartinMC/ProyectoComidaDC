@@ -26,9 +26,7 @@ public interface PlatosRepository extends JpaRepository<Plato, Long> {
 
     List<Plato> findByNombreAndTipoContainsIgnoreCaseAndIsDeletedFalse(String nombre, Tipo tipo);
 
-
-
-    
-
+    @Modifying
+    @Query("UPDATE Plato p SET p.isDeleted = true WHERE p.id = :id")
     void updateIsDeletedToTrueById(Long id);
 }

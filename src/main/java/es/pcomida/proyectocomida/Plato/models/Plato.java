@@ -42,4 +42,8 @@ public class Plato {
     @Column(nullable = false)
     private Integer cantidad;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
 }

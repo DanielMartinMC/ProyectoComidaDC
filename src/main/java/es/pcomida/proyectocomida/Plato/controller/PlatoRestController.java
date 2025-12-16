@@ -36,7 +36,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @RestController // Es un controlador Rest
-@RequestMapping("api/${api.version}/tarjetas") // Es la ruta del controlador
+@RequestMapping("api/${api.version}/Plato") // Es la ruta del controlador
 public class PlatoRestController {
 
     private final PlatosService platosService;
@@ -45,7 +45,7 @@ public class PlatoRestController {
     @GetMapping()
     public ResponseEntity<List<PlatoResponseDto>> getAll(@RequestParam(required = false) String nombre,
                                                            @RequestParam(required = false) Tipo tipo) {
-        log.info("Buscando tarjetas por numero={}, titular={}", nombre, tipo);
+        log.info("Buscando platos por numero={}, titular={}", nombre, tipo);
         return ResponseEntity.ok(platosService.findAll(nombre, tipo));
     }
 

@@ -6,6 +6,7 @@ import es.pcomida.proyectocomida.Plato.dto.PlatoResponseDto;
 import es.pcomida.proyectocomida.Plato.dto.PlatoUpdateDto;
 import es.pcomida.proyectocomida.Plato.exceptions.PlatoNotFoundException;
 import es.pcomida.proyectocomida.Plato.models.Plato;
+import es.pcomida.proyectocomida.Plato.models.Tipo;
 import es.pcomida.proyectocomida.Plato.repositories.PlatosRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class PlatosServiceImpl implements PlatosService {
     private final PlatoMapper platoMapper;
 
     @Override
-    public List<PlatoResponseDto> findAll(String nombre, Enum tipo) {
+    public List<PlatoResponseDto> findAll(String nombre, Tipo tipo) {
         // Si todo está vacío o nulo, devolvemos todos los Platos
         if ((nombre == null || nombre.isEmpty()) && (tipo == null)) {
             log.info("Buscando todos los Platos");
