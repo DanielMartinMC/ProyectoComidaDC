@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
+    @Component
 public class PlatoMapper {
     public Plato toPlato(PlatoCreateDto platoCreateDto/*, Usuario usuario*/) {
         return Plato.builder()

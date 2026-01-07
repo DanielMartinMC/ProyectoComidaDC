@@ -19,3 +19,8 @@ INSERT INTO PLATOS (id, nombre, descripcion, tipo, categoria, precio, variante, 
                                                                                                           (18, 'Lasaña de Berenjena', 'Lasaña vegetal sin pasta, utilizando láminas de berenjena y queso ricotta', 'ALMUERZO', 'PRINCIPAL', 13.50, 'BAJO_CARBOHIDRATO', 20, false),
                                                                                                           (19, 'Sopa de Cebolla', 'Sopa reconfortante con pan tostado y queso gratinado por encima', 'CENA', 'ENTRANTE', 8.00, 'ESTANDAR', 30, false),
                                                                                                           (20, 'Costillas BBQ', 'Costillar de cerdo asado a baja temperatura con salsa barbacoa ahumada', 'ALMUERZO', 'PRINCIPAL', 22.00, 'ESTANDAR', 15, false);
+
+INSERT INTO CARRITOS (id,usuario, estado, fecha_creación, cupon, descuento, impuestos_calc, total) VALUES
+(1,'550e8400-e29b-41d4-a716-446655440000', 'Vacio', CURRENT_TIMESTAMP, 0.0, 0.0, 0.0, 0.0),
+(2,'550e8400-e29b-41d4-a716-446655440001', 'Contenido', CURRENT_TIMESTAMP, 10.0, 5.0, 2.5, 50.0),
+(3,'550e8400-e29b-41d4-a716-446655440002', 'Contenido', CURRENT_TIMESTAMP, 0.0, 0.0, 1.5, 30.0);
