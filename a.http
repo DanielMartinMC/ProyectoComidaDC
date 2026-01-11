@@ -5,4 +5,21 @@ GET http://localhost:3000/api/data
 GET http://localhost:3000/api/v1/Plato
 
 
+###
+
+GET http://localhost:3000/api/v1/Carrito/id?id=1
+
+### Borrar el ítem con ID 5 del carrito con ID 1
+DELETE http://localhost:3000/api/v1/Carrito/1/items/1
+
+### Añadir un plato al carrito
+POST http://localhost:3000/api/v1/Carrito/1/items
+Content-Type: application/json
+
+{
+  "platoID": 1,
+  "cantidad": 2
+}
+
+
 

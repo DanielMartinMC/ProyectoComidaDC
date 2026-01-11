@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.Carrito.dto.CarritoResponseDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.Carrito.models.Carrito;
 import es.pcomida.proyectocomida.Carrito.models.Estados;
+import es.pcomida.proyectocomida.Carrito_item.dto.AddCarritoItemDTO;
 import es.pcomida.proyectocomida.Plato.models.Tipo;
 
 import java.util.List;
@@ -15,11 +16,12 @@ public interface CarritoService {
 
     CarritoResponseDto findById(Long id);
 
-
+    CarritoResponseDto addPlatoToCarrito(Long carritoId, AddCarritoItemDTO itemDTO);
 
     CarritoResponseDto save(CarritoCreateDto carritoCreateDto);
 
     CarritoResponseDto update(Long id, CarritoUpdateDto carritoUpdateDto);
 
+    void deleteItemFromCarrito(Long carritoId, Long id);
     void deleteById(Long id);
 }

@@ -15,7 +15,6 @@ public class CarritoUpdateDto {
     private UUID usuario;
     private Estados estado;
     private LocalDateTime fechaCreación = LocalDateTime.now();
-    private List<Plato> platos;
     private Float cupon;
     private Float descuento;
 }

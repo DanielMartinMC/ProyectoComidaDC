@@ -43,14 +43,11 @@ public class Carrito {
     @Column(nullable = false)
     private Float ImpuestosCalc;
 
-    @Column(nullable = false)
-    private Double total;
-
     @Column(columnDefinition = "boolean default false")
     @Builder.Default
     private Boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Carrito_item> items = new ArrayList<>();
 
 

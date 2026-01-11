@@ -13,9 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CarritoRepository extends JpaRepository<Carrito, Long> {
-    //Usuario findByUsuario(Long usuario);
 
-    Optional<Carrito> findByUsuarioIdAndEstado(Long usuarioId, Estados estado);
 
     @Query("SELECT c FROM Carrito c WHERE c.usuario = :usuario AND LOWER(c.estado) LIKE %:estado%")
     List<Carrito> findByUsuarioAndEstadoContainsIgnoreCase(UUID usuario, Estados estado);

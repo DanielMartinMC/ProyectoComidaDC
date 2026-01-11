@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.Carrito.dto.CarritoResponseDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.Carrito.models.Estados;
 import es.pcomida.proyectocomida.Carrito.services.CarritoService;
+import es.pcomida.proyectocomida.Carrito_item.dto.AddCarritoItemDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,16 @@ public class CarritoRestController {
     }
 
     @GetMapping("/id")
-    public ResponseEntity<CarritoResponseDto> findById(@RequestParam(required = true) Long id) {
+    public ResponseEntity<CarritoResponseDto> findById(@RequestParam Long id) {
         log.info("Buscando Carrito por id={}", id);
         return ResponseEntity.ok(carritoService.findById(id));
+    }
+
+    @PostMapping("/{id}/items")
+    public ResponseEntity<CarritoResponseDto> addPlato(@PathVariable Long id,
+                                                       @RequestBody AddCarritoItemDTO itemDTO){
+        log.info("Añadiendo plato: {}, al carrito: {}", itemDTO, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(carritoService.addPlatoToCarrito(id, itemDTO));
     }
 
 
@@ -68,6 +76,13 @@ public class CarritoRestController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Borrando Carrito por id: {}", id);
         carritoService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{carritoId}/items/{itemId}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long carritoId, @PathVariable Long itemId) {
+        log.info("Borrando el plato: {} del carrito: {}", itemId, carritoId);
+        carritoService.deleteItemFromCarrito(carritoId, itemId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

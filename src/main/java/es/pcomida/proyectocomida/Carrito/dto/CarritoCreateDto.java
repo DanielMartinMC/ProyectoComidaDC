@@ -14,7 +14,6 @@ import java.util.UUID;
 public class CarritoCreateDto {
     private UUID usuario;
     private Estados estado;
-    private List<Plato> platos;
     private Float cupon;
     private Float descuento;
 }
