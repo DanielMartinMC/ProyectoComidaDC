@@ -4,7 +4,7 @@ import es.pcomida.proyectocomida.Carrito.dto.CarritoCreateDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoResponseDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.Carrito.models.Carrito;
-import es.pcomida.proyectocomida.Carrito_item.dto.CarritoItemDTO;
+import es.pcomida.proyectocomida.Carrito_item.dto.CarritoItemResponseDTO;
 import es.pcomida.proyectocomida.Carrito_item.models.Carrito_item;
 import org.springframework.stereotype.Component;
 
@@ -39,8 +39,8 @@ public class CarritoMapper {
     public CarritoResponseDto toCarritoResponseDto(Carrito carrito){
         if(carrito == null){ return null;}
 
-        List<CarritoItemDTO> itemDtos = carrito.getItems().stream()
-                .map(item -> CarritoItemDTO.builder()
+        List<CarritoItemResponseDTO> itemDtos = carrito.getItems().stream()
+                .map(item -> CarritoItemResponseDTO.builder()
                         .platoID(item.getPlato().getId())
                         .nombrePlato(item.getPlato().getNombre())
                         .cantidad(item.getCantidad())
@@ -60,8 +60,8 @@ public class CarritoMapper {
 
     }
 
-    private CarritoItemDTO toItemDTO(Carrito_item item) {
-        return CarritoItemDTO.builder()
+    private CarritoItemResponseDTO toItemDTO(Carrito_item item) {
+        return CarritoItemResponseDTO.builder()
                 .id(item.getId())
                 .platoID(item.getPlato().getId())
                 .nombrePlato(item.getPlato().getNombre())

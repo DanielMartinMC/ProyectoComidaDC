@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController // Es un controlador Rest
+@RestController
 @RequestMapping("api/${api.version}/Carrito")
 public class CarritoRestController {
     private final CarritoService carritoService;

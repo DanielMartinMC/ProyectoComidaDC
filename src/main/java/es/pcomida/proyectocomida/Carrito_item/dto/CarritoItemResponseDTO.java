@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarritoItemDTO {
+public class CarritoItemResponseDTO {
     private Long id;
     private Long platoID;
     private String nombrePlato;
