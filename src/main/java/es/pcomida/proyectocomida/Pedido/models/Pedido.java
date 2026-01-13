@@ -1,5 +1,6 @@
 package es.pcomida.proyectocomida.Pedido.models;
 
+import es.pcomida.proyectocomida.Plato.models.Plato;
 import es.pcomida.proyectocomida.Plato.models.Tipo;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "PEDIDOS")
 public class Pedido {
 
@@ -20,7 +22,7 @@ public class Pedido {
 
     @Column(nullable = false)
     private Date fechaPedido;
-
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
@@ -32,4 +34,12 @@ public class Pedido {
 
     @Column(nullable = false)
     private String direccion;
+
+    @Builder.Default
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDeleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "id_plato")
+    private Plato plato;
 }

@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.Pedido.models.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface PedidosRepository extends JpaRepository<Pedido, Long> {
 
     List<Pedido> findByUsuarioContainsIgnoreCaseAndIsDeletedFalse(Long usuario);
 
-    @Query("SELECT p FROM Pedido p WHERE p.usuario = :usuario AND LOWER(p.usuario) like %:usuario% AND LOWER(p.estado) like %:estado%")
+    @Query("SELECT p FROM Pedido p WHERE p.usuario = :usuario AND LOWER(p.estado) like %:estado%")
     List<Pedido> findByUsuarioAndEstadoContainsIgnoreCase(Long Usuario, Estado estado);
 
     List<Pedido> findByUsuarioAndEstadoContainsIgnoreCaseAndIsDeletedFalse(Long usuario, Estado estado);
@@ -27,3 +28,5 @@ public interface PedidosRepository extends JpaRepository<Pedido, Long> {
     @Modifying
     @Query("UPDATE Pedido p SET p.isDeleted = true WHERE p.id = :id")
     void updateIsDeletedToTrueById(Long id);
+
+}

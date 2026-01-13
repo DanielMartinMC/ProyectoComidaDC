@@ -4,5 +4,8 @@ GET http://localhost:3000/api/data
 
 GET http://localhost:3000/api/v1/Plato
 
+###
+GET http://localhost:3000/api/v1/Pedido?usuario=101
+
 
 
