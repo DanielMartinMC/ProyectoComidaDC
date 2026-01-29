@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,27 +24,40 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "nombre no puede estar vacío")
+    @NotBlank(message = "El nombre no puede estar vacío")
     @Column(nullable = false)
     private String nombre;
 
     @Column(nullable = false)
-    @NotBlank(message = "apellidos no puede estar vacío")
+    @NotBlank(message = "Los apellidos no pueden estar vacío")
     private String apellidos;
 
     @Column(unique = true, nullable = false)
-    @NotBlank(message = "Username no puede estar vacío")
+    @NotBlank(message = "El username no puede estar vacío")
     private String username;
 
     @Column(unique = true, nullable = false)
     @Email(regexp = ".*@.*\\..*", message = "Email debe ser válido")
-    @NotBlank(message = "Email no puede estar vacío")
+    @NotBlank(message = "El email no puede estar vacío")
     private String email;
 
-    @NotBlank(message = "Password no puede estar vacío")
-    @Length(min = 10, message = "Password debe tener al menos 5 caracteres")
+    @NotBlank(message = "La password no puede estar vacía")
+    @Length(min = 10, message = "La Password debe tener al menos 5 caracteres")
     @Column(nullable = false)
     private String password;
+
+    @NotBlank(message = "La dirección no puede estar vacía")
+    private String direccion;
+
+    @NotBlank(message = "El código postal no puede estar vacío")
+    @Length(min = 5, max = 5, message = "El código postal debe tener 5 dígitos")
+    private String codigoPostal;
+
+    @NotBlank(message = "La ciudad no puede estar vacía")
+    private String ciudad;
+
+    @NotBlank(message = "El país no puede estar vacío")
+    private String pais;
 
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Builder.Default
@@ -61,7 +75,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Set<Roles> roles;
 
-    @OneToMany
-    @JoinColumn(name = "carrito_id")
-    private Carrito titular;
+    @Column(columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean isSuscriptor = false;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Carrito> carritos;
 }

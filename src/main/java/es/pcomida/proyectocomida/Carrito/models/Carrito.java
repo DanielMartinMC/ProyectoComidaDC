@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.Carrito.models;
 
 import es.pcomida.proyectocomida.Carrito_item.models.Carrito_item;
+import es.pcomida.proyectocomida.Usuario.models.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,6 @@ public class Carrito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private UUID usuario;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -49,6 +47,10 @@ public class Carrito {
 
     @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Carrito_item> items = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
+    private Usuario usuario;
 
 
 
