@@ -41,6 +41,10 @@ public class Usuario {
     @NotBlank(message = "El email no puede estar vacío")
     private String email;
 
+    @NotBlank(message = "EL telefono no puede estar vacio")
+    @Column(unique = true, nullable = false)
+    private String telefono;
+
     @NotBlank(message = "La password no puede estar vacía")
     @Length(min = 10, message = "La Password debe tener al menos 5 caracteres")
     @Column(nullable = false)
@@ -73,6 +77,9 @@ public class Usuario {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    // CORRECCIÓN: Forzamos el nombre de la tabla y la columna de unión
+    @CollectionTable(name = "USUARIOS_ROLES", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "rol") // Nombramos la columna que contendrá el rol
     private Set<Roles> roles;
 
     @Column(columnDefinition = "boolean default false")

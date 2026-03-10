@@ -3,16 +3,15 @@ package es.pcomida.proyectocomida.Carrito.services;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoCreateDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoResponseDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoUpdateDto;
-import es.pcomida.proyectocomida.Carrito.models.Carrito;
 import es.pcomida.proyectocomida.Carrito.models.Estados;
 import es.pcomida.proyectocomida.Carrito_item.dto.AddCarritoItemDTO;
-import es.pcomida.proyectocomida.Plato.models.Tipo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 public interface CarritoService {
-    List<CarritoResponseDto> findAll(UUID usuario, Estados estados);
+    Page<CarritoResponseDto> findAll(Optional<Long> usuarioId, Optional<Estados> estado, Optional<Boolean> isDeleted, Pageable pageable);
 
     CarritoResponseDto findById(Long id);
 

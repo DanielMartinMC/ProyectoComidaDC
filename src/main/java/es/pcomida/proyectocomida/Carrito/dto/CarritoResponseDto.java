@@ -7,8 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Data
@@ -16,11 +16,13 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CarritoResponseDto {
     private Long id;
-    private UUID usuario;
+    private Long usuarioId;
     private Estados estado;
     private List<CarritoItemResponseDTO> items;
-    private Float cupon;
-    private Float descuento;
-    private Float ImpuestosCalc;
+    private String codigoCupon;
+    private Double descuento;
+    private Double impuestosCalc;
     private Double total;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
 }

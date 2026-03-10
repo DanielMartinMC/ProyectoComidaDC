@@ -1,0 +1,3 @@
+### Obtener todos los usuarios (paginado)
+GET http://localhost:3000/v1/usuarios?page=0&size=5&sortBy=username&direction=asc
+Accept: application/json

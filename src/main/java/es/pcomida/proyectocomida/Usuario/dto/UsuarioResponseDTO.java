@@ -17,7 +17,6 @@ public class UsuarioResponseDTO {
     private String apellidos;
     private String username;
     private String email;
-    private String password;
     private String direccion;
     private String codigoPostal;
     private String telefono;

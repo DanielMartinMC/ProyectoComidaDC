@@ -1,19 +1,12 @@
 package es.pcomida.proyectocomida.Carrito.dto;
 
-import es.pcomida.proyectocomida.Carrito.models.Estados;
-import es.pcomida.proyectocomida.Plato.models.Plato;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-@Builder
 @Data
+@Builder
 public class CarritoCreateDto {
-    private UUID usuario;
-    private Estados estado;
-    private Float cupon;
-    private Float descuento;
+    @NotNull(message = "El id de usuario no puede ser nulo")
+    private Long usuarioId;
 }

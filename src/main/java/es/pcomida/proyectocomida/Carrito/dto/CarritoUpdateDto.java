@@ -1,20 +1,17 @@
 package es.pcomida.proyectocomida.Carrito.dto;
 
-import es.pcomida.proyectocomida.Carrito.models.Estados;
-import es.pcomida.proyectocomida.Plato.models.Plato;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-@Builder
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CarritoUpdateDto {
-    private UUID usuario;
-    private Estados estado;
-    private LocalDateTime fechaCreación;
-    private Float cupon;
-    private Float descuento;
+    // El único campo que un usuario debería poder actualizar directamente en el carrito
+    // es el código del cupón. El resto de campos (estado, total) se actualizan
+    // como consecuencia de otras acciones (añadir/quitar productos, pagar, etc.).
+    private String codigoCupon;
 }

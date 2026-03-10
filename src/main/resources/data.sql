@@ -1,31 +1,37 @@
+-- Borramos los datos para evitar conflictos si se ejecuta varias veces
+DELETE FROM CARRITO_ITEMS;
+DELETE FROM CARRITOS;
+DELETE FROM USUARIOS_ROLES;
+DELETE FROM USUARIOS;
+DELETE FROM PLATOS;
+
+-- Insertamos Usuarios
+INSERT INTO USUARIOS (id, nombre, apellidos, username, email, telefono, password, direccion, codigo_postal, ciudad, pais, is_deleted, is_suscriptor) VALUES
+(1, 'Carlos', 'García', 'carlos', 'carlos@test.com', '611111111', 'password123456', 'Calle Falsa 123', '28001', 'Madrid', 'España', false, false),
+(2, 'Ana', 'Martinez', 'ana', 'ana@test.com', '622222222', 'password123456', 'Avenida Principal 45', '08001', 'Barcelona', 'España', false, true),
+(3, 'Luis', 'Hernández', 'luis', 'luis@test.com', '633333333', 'password123456', 'Plaza Mayor 1', '41001', 'Sevilla', 'España', false, false);
+
+-- Insertamos los roles para cada usuario en la tabla de unión
+-- CORREGIDO: La columna se llama 'rol' según la anotación @Column(name="rol")
+INSERT INTO USUARIOS_ROLES (usuario_id, rol) VALUES
+(1, 'USER'),
+(2, 'USER'),
+(3, 'USER');
+
+-- Insertamos Platos
 INSERT INTO PLATOS (id, nombre, descripcion, tipo, categoria, precio, variante, cantidad, is_deleted) VALUES
-                                                                                                          (1, 'Ensalada César', 'Lechuga romana, crutones, queso parmesano y salsa césar casera', 'ALMUERZO', 'ENTRANTE', 12.50, 'ESTANDAR', 50, false),
-                                                                                                          (2, 'Solomillo a la Pimienta', 'Corte de res tierno bañado en salsa de pimienta negra con guarnición de patatas', 'CENA', 'PRINCIPAL', 24.00, 'ESTANDAR', 20, false),
-                                                                                                          (3, 'Salmón a la Plancha', 'Filete de salmón fresco con espárragos trigueros y limón', 'ALMUERZO', 'PRINCIPAL', 18.50, 'SIN_GLUTEN', 30, false),
-                                                                                                          (4, 'Risotto de Setas', 'Arroz cremoso con variedad de hongos silvestres y aceite de trufa', 'CENA', 'PRINCIPAL', 15.00, 'SIN_GLUTEN', 25, false),
-                                                                                                          (5, 'Tiramisú Clásico', 'Postre italiano con capas de bizcocho empapado en café y crema de mascarpone', 'CENA', 'POSTRE', 7.50, 'ESTANDAR', 40, false),
-                                                                                                          (6, 'Alitas de Pollo Picantes', 'Alitas fritas bañadas en salsa barbacoa picante con bastones de apio', 'CENA', 'ENTRANTE', 10.00, 'PICANTE', 60, false),
-                                                                                                          (7, 'Gazpacho Andaluz', 'Sopa fría de tomate, pimiento y pepino, ideal para el verano', 'ALMUERZO', 'ENTRANTE', 6.50, 'VEGANO', 45, false),
-                                                                                                          (8, 'Hamburguesa de la Casa', 'Carne 100% vacuno, queso cheddar, bacon y huevo frito en pan brioche', 'CENA', 'PRINCIPAL', 13.90, 'ESTANDAR', 100, false),
-                                                                                                          (9, 'Tostada de Aguacate', 'Pan de masa madre con aguacate triturado, semillas y huevo poché', 'DESAYUNO', 'PRINCIPAL', 9.00, 'ESTANDAR', 50, false),
-                                                                                                          (10, 'Curry de Verduras', 'Mezcla de verduras de temporada en salsa de curry rojo con leche de coco', 'ALMUERZO', 'PRINCIPAL', 14.50, 'PICANTE', 35, false),
-                                                                                                          (11, 'Brownie con Helado', 'Bizcocho denso de chocolate con nueces servido con helado de vainilla', 'MERIENDA', 'POSTRE', 6.00, 'ESTANDAR', 30, false),
-                                                                                                          (12, 'Espaguetis Carbonara', 'Pasta fresca con salsa tradicional de yema de huevo, pecorino y guanciale', 'ALMUERZO', 'PRINCIPAL', 12.00, 'ESTANDAR', 40, false),
-                                                                                                          (13, 'Tabla de Quesos', 'Selección de quesos nacionales e internacionales con uvas y nueces', 'CENA', 'ENTRANTE', 16.00, 'SIN_GLUTEN', 15, false),
-                                                                                                          (14, 'Tacos al Pastor', 'Tortillas de maíz con cerdo marinado, piña y cilantro', 'CENA', 'PRINCIPAL', 11.00, 'PICANTE', 80, false),
-                                                                                                          (15, 'Cheesecake de Frutos Rojos', 'Tarta de queso horneada con mermelada de fresas y arándanos', 'MERIENDA', 'POSTRE', 5.50, 'ESTANDAR', 25, false),
-                                                                                                          (16, 'Poke Bowl de Atún', 'Arroz de sushi, atún fresco marinado, edamame y algas wakame', 'ALMUERZO', 'PRINCIPAL', 17.00, 'SIN_GLUTEN', 20, false),
-                                                                                                          (17, 'Croquetas de Jamón', 'Croquetas cremosas caseras de jamón ibérico (Ración de 8)', 'CENA', 'ENTRANTE', 9.50, 'ESTANDAR', 70, false),
-                                                                                                          (18, 'Lasaña de Berenjena', 'Lasaña vegetal sin pasta, utilizando láminas de berenjena y queso ricotta', 'ALMUERZO', 'PRINCIPAL', 13.50, 'BAJO_CARBOHIDRATO', 20, false),
-                                                                                                          (19, 'Sopa de Cebolla', 'Sopa reconfortante con pan tostado y queso gratinado por encima', 'CENA', 'ENTRANTE', 8.00, 'ESTANDAR', 30, false),
-                                                                                                          (20, 'Costillas BBQ', 'Costillar de cerdo asado a baja temperatura con salsa barbacoa ahumada', 'ALMUERZO', 'PRINCIPAL', 22.00, 'ESTANDAR', 15, false);
+(1, 'Ensalada César', 'Lechuga romana, crutones, queso parmesano y salsa césar casera', 'ALMUERZO', 'ENTRANTE', 12.50, 'ESTANDAR', 50, false),
+(2, 'Solomillo a la Pimienta', 'Corte de res tierno bañado en salsa de pimienta negra con guarnición de patatas', 'CENA', 'PRINCIPAL', 24.00, 'ESTANDAR', 20, false),
+(3, 'Salmón a la Plancha', 'Filete de salmón fresco con espárragos trigueros y limón', 'ALMUERZO', 'PRINCIPAL', 18.50, 'SIN_GLUTEN', 30, false);
 
-INSERT INTO CARRITOS (id,usuario, estado, fecha_creación, cupon, descuento, impuestos_calc) VALUES
-(1,'550e8400-e29b-41d4-a716-446655440000', 'Vacio', CURRENT_TIMESTAMP, 0.0, 0.0, 0.0 ),
-(2,'550e8400-e29b-41d4-a716-446655440001', 'Contenido', CURRENT_TIMESTAMP, 10.0, 5.0, 2.5 ),
-(3,'550e8400-e29b-41d4-a716-446655440002', 'Contenido', CURRENT_TIMESTAMP, 0.0, 0.0, 1.5 );
+-- Insertamos Carritos
+INSERT INTO CARRITOS (id, usuario_id, estado, codigo_cupon, descuento, impuestos_calc, total, is_deleted) VALUES
+(1, 1, 'Vacio', NULL, 0.0, 0.0, 0.0, false),
+(2, 2, 'Contenido', 'VERANO', 5.0, 2.5, 50.0, false),
+(3, 3, 'Contenido', NULL, 0.0, 1.5, 30.0, false);
 
-
-INSERT INTO CARRITO_ITEMS(carrito_id,plato_id, cantidad) VALUES (
-                                                                 1,1,2
-                                                                )
+-- Insertamos Items de Carrito
+INSERT INTO CARRITO_ITEMS(carrito_id, plato_id, cantidad, precio_unitario) VALUES
+(2, 1, 2, 12.50),
+(2, 3, 1, 18.50),
+(3, 2, 1, 24.00);

@@ -1,0 +1,3 @@
+### Obtener todos los carritos (paginado)
+GET http://localhost:3000/v1/carritos?page=0&size=5&sortBy=id&direction=asc
+Accept: application/json

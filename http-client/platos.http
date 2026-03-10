@@ -1,0 +1,3 @@
+### Obtener todos los platos (paginado)
+GET http://localhost:3000/v1/platos?page=0&size=5&sortBy=nombre&direction=asc
+Accept: application/json

@@ -4,8 +4,9 @@ import es.pcomida.proyectocomida.Carrito.dto.CarritoCreateDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoResponseDto;
 import es.pcomida.proyectocomida.Carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.Carrito.models.Carrito;
+import es.pcomida.proyectocomida.Carrito.models.Estados;
 import es.pcomida.proyectocomida.Carrito_item.dto.CarritoItemResponseDTO;
-import es.pcomida.proyectocomida.Carrito_item.models.Carrito_item;
+import es.pcomida.proyectocomida.Usuario.models.Usuario;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,34 +14,34 @@ import java.util.List;
 
 @Component
 public class CarritoMapper {
-    public Carrito toCarrito(CarritoCreateDto carritoCreateDto){
+
+    public Carrito toCarrito(CarritoCreateDto carritoCreateDto, Usuario usuario) {
         return Carrito.builder()
-                .usuario(carritoCreateDto.getUsuario())
-                .estado(carritoCreateDto.getEstado())
+                .usuario(usuario)
+                .estado(Estados.Vacio)
                 .items(new ArrayList<>())
-                .cupon(carritoCreateDto.getCupon())
-                .descuento(carritoCreateDto.getDescuento())
-                .ImpuestosCalc(0.0f)
-                .build();
-    }
-    public Carrito toCarrito(CarritoUpdateDto carritoUpdateDto,Carrito carrito){
-        return Carrito.builder()
-                .id(carrito.getId())
-                .usuario(carritoUpdateDto.getUsuario() != null ? carritoUpdateDto.getUsuario() : carrito.getUsuario())
-                .estado(carritoUpdateDto.getEstado() != null ? carritoUpdateDto.getEstado() : carrito.getEstado())
-                .fechaCreación(carrito.getFechaCreación())
-                .items(carrito.getItems())
-                .cupon(carritoUpdateDto.getCupon() != null ? carritoUpdateDto.getCupon() : carrito.getCupon())
-                .descuento(carritoUpdateDto.getDescuento() != null ? carritoUpdateDto.getDescuento() : carrito.getDescuento())
-                .ImpuestosCalc(carrito.getImpuestosCalc())
+                .codigoCupon(null)
+                .descuento(0.0)
+                .impuestosCalc(0.0)
+                .total(0.0)
+                .isDeleted(false)
                 .build();
     }
 
-    public CarritoResponseDto toCarritoResponseDto(Carrito carrito){
-        if(carrito == null){ return null;}
+    public Carrito toCarrito(CarritoUpdateDto carritoUpdateDto, Carrito carrito) {
+        // Solo permitimos actualizar el código del cupón directamente
+        if (carritoUpdateDto.getCodigoCupon() != null) {
+            carrito.setCodigoCupon(carritoUpdateDto.getCodigoCupon());
+        }
+        return carrito;
+    }
+
+    public CarritoResponseDto toCarritoResponseDto(Carrito carrito) {
+        if (carrito == null) return null;
 
         List<CarritoItemResponseDTO> itemDtos = carrito.getItems().stream()
                 .map(item -> CarritoItemResponseDTO.builder()
+                        .id(item.getId())
                         .platoID(item.getPlato().getId())
                         .nombrePlato(item.getPlato().getNombre())
                         .cantidad(item.getCantidad())
@@ -49,25 +50,17 @@ public class CarritoMapper {
                         .build())
                 .toList();
 
-
         return CarritoResponseDto.builder()
                 .id(carrito.getId())
-                .usuario(carrito.getUsuario())
+                .usuarioId(carrito.getUsuario().getId())
                 .items(itemDtos)
                 .estado(carrito.getEstado())
-                .total(itemDtos.stream().mapToDouble(item -> item.getSubtotal()).sum())
-                .build();
-
-    }
-
-    private CarritoItemResponseDTO toItemDTO(Carrito_item item) {
-        return CarritoItemResponseDTO.builder()
-                .id(item.getId())
-                .platoID(item.getPlato().getId())
-                .nombrePlato(item.getPlato().getNombre())
-                .precioUnidad(item.getPlato().getPrecio())
-                .cantidad(item.getCantidad())
-                .subtotal(item.getPlato().getPrecio() * item.getCantidad())
+                .codigoCupon(carrito.getCodigoCupon())
+                .descuento(carrito.getDescuento())
+                .impuestosCalc(carrito.getImpuestosCalc())
+                .total(carrito.getTotal())
+                .fechaCreacion(carrito.getFechaCreación())
+                .fechaActualizacion(carrito.getFechaActualizacion())
                 .build();
     }
 
