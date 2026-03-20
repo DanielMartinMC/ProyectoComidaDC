@@ -1,0 +1,21 @@
+package es.pcomida.proyectocomida.Pedido.services;
+
+import es.pcomida.proyectocomida.Pedido.dto.PedidoResponseDto;
+import es.pcomida.proyectocomida.Pedido.dto.PedidoUpdateDto;
+import es.pcomida.proyectocomida.Pedido.models.Estado;
+import es.pcomida.proyectocomida.Pedido.dto.PedidoCreateDto;
+import java.util.List;
+
+public interface PedidosService {
+    List<PedidoResponseDto> findAll(Long usuario, Estado estado);
+
+    /*List<PlatoResponseDto> findByEsVegetariano(String esVegetariano);*/
+
+    PedidoResponseDto findById(Long id);
+
+    PedidoResponseDto save(PedidoCreateDto pedidoCreateDto);
+
+    PedidoResponseDto update(Long id, PedidoUpdateDto pedidoUpdateDto);
+
+    void deleteById(Long id);
+}

@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.Reparto.models;
 
 import es.pcomida.proyectocomida.Carrito.models.Carrito;
+import es.pcomida.proyectocomida.Pedido.models.Pedido;
 import es.pcomida.proyectocomida.Usuario.models.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,8 +26,8 @@ public class Reparto {
     private Long repartidorID;
 
     @OneToOne
-    @JoinColumn(name = "carrito_id", nullable = false, unique = true)
-    private Carrito carrito;
+    @JoinColumn(name = "pedido_id", nullable = false, unique = true)
+    private Pedido pedido_id;
 
     @Column(nullable = false)
     private String direccionDestino;
