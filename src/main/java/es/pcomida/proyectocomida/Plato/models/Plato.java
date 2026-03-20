@@ -45,5 +45,5 @@ public class Plato {
     @Builder.Default
     @Column(nullable = false)
     private boolean isDeleted = false;
-    
+
 }

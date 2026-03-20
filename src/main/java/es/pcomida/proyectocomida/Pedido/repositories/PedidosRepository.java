@@ -3,12 +3,15 @@ package es.pcomida.proyectocomida.Pedido.repositories;
 import es.pcomida.proyectocomida.Pedido.models.Estado;
 import es.pcomida.proyectocomida.Pedido.models.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface PedidosRepository extends JpaRepository<Pedido, Long> {
+@Repository
+public interface PedidosRepository extends JpaRepository<Pedido, Long>, JpaSpecificationExecutor<Pedido> {
 
     List<Pedido> findByUsuario(Long usuario);
 
