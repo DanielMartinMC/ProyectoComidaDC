@@ -20,14 +20,14 @@ INSERT INTO PLATOS (id, nombre, descripcion, tipo, categoria, precio, variante, 
 (19, 'Sopa de Cebolla', 'Sopa reconfortante con pan tostado y queso gratinado por encima', 'CENA', 'ENTRANTE', 8.00, 'ESTANDAR', 30, false),
 (20, 'Costillas BBQ', 'Costillar de cerdo asado a baja temperatura con salsa barbacoa ahumada', 'ALMUERZO', 'PRINCIPAL', 22.00, 'ESTANDAR', 15, false);
 
-INSERT INTO PEDIDOS (id, fecha_pedido, estado, total, usuario, direccion) VALUES
-(1, '2026-01-01 10:30:00', 'PROCESADO', 150.50, 101, 'Calle Mayor 15, Madrid'),
-(2, '2026-01-02 11:15:00', 'ENVIADO', 89.99, 102, 'Avenida de la Constitución 4, Sevilla'),
-(3, '2026-01-03 09:00:00', 'PENDIENTE', 45.00, 103, 'Carrer de Balmes 22, Barcelona'),
-(4, '2026-01-04 14:45:00', 'ENTREGADO', 210.25, 104, 'Rúa Nova 8, Santiago de Compostela'),
-(5, '2026-01-05 16:20:00', 'CANCELADO', 12.50, 105, 'Calle Larios 3, Málaga'),
-(6, '2026-01-06 18:00:00', 'PROCESADO', 320.00, 106, 'Paseo de Zorrilla 50, Valladolid'),
-(7, '2026-01-07 12:10:00', 'PENDIENTE', 75.60, 107, 'Calle Alfonso I 12, Zaragoza'),
-(8, '2026-01-08 08:30:00', 'ENVIADO', 115.00, 108, 'Calle San Fernando 2, Santander'),
-(9, '2026-01-09 20:15:00', 'PROCESADO', 55.40, 109, 'Avenida de la Libertad 1, San Sebastián'),
-(10, '2026-01-10 13:40:00', 'ENTREGADO', 99.99, 110, 'Calle Recogidas 7, Granada');
+INSERT INTO PEDIDOS (id, fecha_pedido, estado, total, usuario, direccion, is_deleted) VALUES
+(1, '2026-01-01 10:30:00', 'ENPROCESO', 150.50, 101, 'Calle Mayor 15, Madrid', false),
+(2, '2026-01-02 11:15:00', 'ENVIADO', 89.99, 102, 'Avenida de la Constitución 4, Sevilla', true),
+(3, '2026-01-03 09:00:00', 'ENTREGADO', 45.00, 103, 'Carrer de Balmes 22, Barcelona', false),
+(4, '2026-01-04 14:45:00', 'ENTREGADO', 210.25, 104, 'Rúa Nova 8, Santiago de Compostela', false),
+(5, '2026-01-05 16:20:00', 'CANCELADO', 12.50, 105, 'Calle Larios 3, Málaga', true),
+(6, '2026-01-06 18:00:00', 'ENPROCESO', 320.00, 106, 'Paseo de Zorrilla 50, Valladolid', true),
+(7, '2026-01-07 12:10:00', 'NOENVIADO', 75.60, 107, 'Calle Alfonso I 12, Zaragoza', true),
+(8, '2026-01-08 08:30:00', 'ENVIADO', 115.00, 108, 'Calle San Fernando 2, Santander', false),
+(9, '2026-01-09 20:15:00', 'ENPROCESO', 55.40, 109, 'Avenida de la Libertad 1, San Sebastián', true),
+(10, '2026-01-10 13:40:00', 'ENTREGADO', 99.99, 110, 'Calle Recogidas 7, Granada', false);
