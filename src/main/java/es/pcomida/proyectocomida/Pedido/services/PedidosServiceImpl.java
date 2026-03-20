@@ -8,24 +8,18 @@ import es.pcomida.proyectocomida.Pedido.mapper.PedidoMapper;
 import es.pcomida.proyectocomida.Pedido.models.Estado;
 import es.pcomida.proyectocomida.Pedido.models.Pedido;
 import es.pcomida.proyectocomida.Pedido.repositories.PedidosRepository;
-import es.pcomida.proyectocomida.Plato.dto.PlatoCreateDto;
-import es.pcomida.proyectocomida.Plato.dto.PlatoResponseDto;
-import es.pcomida.proyectocomida.Plato.dto.PlatoUpdateDto;
-import es.pcomida.proyectocomida.Plato.exceptions.PlatoNotFoundException;
-import es.pcomida.proyectocomida.Plato.mapper.PlatoMapper;
-import es.pcomida.proyectocomida.Plato.models.Plato;
-import es.pcomida.proyectocomida.Plato.models.Tipo;
-import es.pcomida.proyectocomida.Plato.repositories.PlatosRepository;
-import es.pcomida.proyectocomida.Plato.services.PlatosService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,25 +30,26 @@ public class PedidosServiceImpl implements PedidosService {
     private final PedidoMapper pedidoMapper;
 
     @Override
-    public List<PedidoResponseDto> findAll(Long usuario, Estado estado) {
-        // Si todo está vacío o nulo, devolvemos todos los Platos
-        if ((usuario == null) && (estado == null)) {
-            log.info("Buscando todos los Pedidos");
-            return pedidoMapper.toResponseDtoList(pedidosRepository.findAll());
-        }
-        // Si la nombre no está vacía, pero la categoría si, buscamos por nombre
-        if ((usuario != null) && (estado == null)) {
-            log.info("Buscando productos por usuario: " + usuario);
-            return pedidoMapper.toResponseDtoList(pedidosRepository.findByUsuario(usuario));
-        }
-        // Si la nombre está vacía, pero la categoría no, buscamos por categoría
-        if (usuario == null) {
-            log.info("Buscando productos por estado: " + estado);
-            return pedidoMapper.toResponseDtoList(pedidosRepository.findByEstadoContainsIgnoreCase(estado));
-        }
-        // Si la nombre y la categoría no están vacías, buscamos por ambas
-        log.info("Buscando productos por usuario: " + usuario + " y estado: " + estado);
-        return pedidoMapper.toResponseDtoList(pedidosRepository.findByUsuarioAndEstado(usuario, estado));
+    public Page<PedidoResponseDto> findAll(Optional<Long> usuario, Optional<Estado> estado, Pageable pageable) {
+        log.info("Buscando pedidos con filtros: usuario={}, estado={}", usuario, estado);
+
+        Specification<Pedido> specUsuario = (root, query, cb) ->
+                usuario.map(u -> cb.equal(root.get("usuario"), u))
+                        .orElseGet(() -> cb.isTrue(cb.literal(true)));
+
+        Specification<Pedido> specEstado = (root, query, cb) ->
+                estado.map(e -> cb.equal(root.get("estado"), e))
+                        .orElseGet(() -> cb.isTrue(cb.literal(true)));
+
+        Specification<Pedido> specIsDeleted = (root, query, cb) ->
+                cb.equal(root.get("isDeleted"), false); // Asumimos que por defecto solo mostramos los no borrados
+
+        Specification<Pedido> criterio = Specification.where(specUsuario)
+                .and(specEstado)
+                .and(specIsDeleted);
+
+        Page<Pedido> pedidoPage = pedidosRepository.findAll(criterio, pageable);
+        return pedidoPage.map(pedidoMapper::toPedidoResponseDto);
     }
 
     @Override
@@ -62,7 +57,7 @@ public class PedidosServiceImpl implements PedidosService {
     public PedidoResponseDto findById(Long id) {
         log.info("Buscando producto por id: " + id);
         return pedidoMapper.toPedidoResponseDto(pedidosRepository.findById(id)
-                .orElseThrow(() -> new PlatoNotFoundException(id)));
+                .orElseThrow(() -> new PedidoNotFoundException(id)));
     }
 
 
@@ -70,10 +65,8 @@ public class PedidosServiceImpl implements PedidosService {
     @Override
     public PedidoResponseDto save(PedidoCreateDto pedidoCreateDto) {
         log.info("Guardando producto: " + pedidoCreateDto);
-        // obtenemos el id de producto
-        // Creamos el producto nuevo con los datos que nos vienen del dto, podríamos usar el mapper
+
         Pedido nuevoPedido = pedidoMapper.toPedido(pedidoCreateDto);
-        // Lo guardamos en el repositorio
         return pedidoMapper.toPedidoResponseDto(pedidosRepository.save(nuevoPedido));
     }
 

@@ -4,12 +4,13 @@ import es.pcomida.proyectocomida.Pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.Pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.Pedido.models.Estado;
 import es.pcomida.proyectocomida.Pedido.dto.PedidoCreateDto;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Optional;
 
 public interface PedidosService {
-    List<PedidoResponseDto> findAll(Long usuario, Estado estado);
-
-    /*List<PlatoResponseDto> findByEsVegetariano(String esVegetariano);*/
+    Page<PedidoResponseDto> findAll(Optional<Long> usuario, Optional<Estado> estado, Pageable pageable);
 
     PedidoResponseDto findById(Long id);
 
