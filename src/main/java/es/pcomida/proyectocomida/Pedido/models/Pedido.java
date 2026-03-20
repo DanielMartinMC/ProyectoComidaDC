@@ -11,6 +11,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "PEDIDOS")
 public class Pedido {
 
@@ -32,4 +33,7 @@ public class Pedido {
 
     @Column(nullable = false)
     private String direccion;
+
+    @Builder.Default
+    private Boolean isDeleted = false;
 }

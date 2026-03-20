@@ -54,7 +54,7 @@ public class PedidosServiceImpl implements PedidosService {
         }
         // Si la nombre y la categoría no están vacías, buscamos por ambas
         log.info("Buscando productos por usuario: " + usuario + " y estado: " + estado);
-        return pedidoMapper.toResponseDtoList(pedidosRepository.findByUsuarioAndEstadoContainsIgnoreCase(usuario, estado));
+        return pedidoMapper.toResponseDtoList(pedidosRepository.findByUsuarioAndEstado(usuario, estado));
     }
 
     @Override

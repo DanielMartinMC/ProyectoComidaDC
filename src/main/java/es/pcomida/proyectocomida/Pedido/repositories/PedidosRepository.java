@@ -22,8 +22,11 @@ public interface PedidosRepository extends JpaRepository<Pedido, Long> {
     @Query("SELECT p FROM Pedido p WHERE p.usuario = :usuario AND LOWER(p.usuario) like %:usuario% AND LOWER(p.estado) like %:estado%")
     List<Pedido> findByUsuarioAndEstadoContainsIgnoreCase(Long Usuario, Estado estado);
 
-    List<Pedido> findByUsuarioAndEstadoContainsIgnoreCaseAndIsDeletedFalse(Long usuario, Estado estado);
+    // List<Pedido> findByUsuarioAndEstadoContainsIgnoreCaseAndIsDeletedFalse(Long usuario, Estado estado);
 
     @Modifying
     @Query("UPDATE Pedido p SET p.isDeleted = true WHERE p.id = :id")
     void updateIsDeletedToTrueById(Long id);
+
+    List<Pedido> findByUsuarioAndEstado(Long usuario, Estado estado);
+}
