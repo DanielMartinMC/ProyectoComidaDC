@@ -1,3 +1,32 @@
-### Obtener todos los usuarios (paginado)
-GET http://localhost:3000/v1/usuarios?page=0&size=5&sortBy=username&direction=asc
-Accept: application/json
+### Variables
+@baseUrl = http://localhost:3000
+@apiVersion = /api/v1
+@token =
+
+###
+# ==============================================================================
+# PASO 1: Iniciar sesión como Administrador
+# ==============================================================================
+# Ejecuta esta petición primero. Guardará el token automáticamente.
+# @name signInAdmin
+POST {{baseUrl}}{{apiVersion}}/auth/signin
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123456"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+%}
+
+###
+# ==============================================================================
+# PASO 2: Obtener todos los usuarios (Ruta Protegida)
+# ==============================================================================
+# Una vez que hayas iniciado sesión (Paso 1), ejecuta esta petición.
+# Usará el token guardado para autenticarse.
+# @name getAllUsers
+GET {{baseUrl}}{{apiVersion}}/usuarios
+Authorization: Bearer {{token}}

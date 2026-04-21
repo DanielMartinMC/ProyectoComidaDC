@@ -1,3 +1,12 @@
-### Obtener todos los carritos (paginado)
-GET http://localhost:3000/v1/carritos?page=0&size=5&sortBy=id&direction=asc
-Accept: application/json
+### Variables
+@baseUrl = http://localhost:8080
+@apiVersion = /api/v1
+
+###
+# ==============================================================================
+# PLATOS ENDPOINTS
+# ==============================================================================
+
+### Obtener todos los platos (Público)
+# Esta es la petición más simple para verificar que el servidor responde.
+GET {{baseUrl}}{{apiVersion}}/platos
