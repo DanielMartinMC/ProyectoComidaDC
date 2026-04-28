@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,9 +74,6 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
     @Transactional
     @CachePut(key = "#result.id")
     public UsuarioResponseDTO save(UsuarioCreateDTO usuarioCreateDTO) {
-        // La creación de usuarios ahora se gestiona a través del AuthenticationService (signUp)
-        // Este método podría ser usado por un ADMIN para crear usuarios, pero se necesitaría una lógica diferente.
-        // Por ahora, lanzamos una excepción para evitar su uso accidental.
         throw new UnsupportedOperationException("La creación de usuarios debe hacerse a través del endpoint de registro /signup.");
     }
 
@@ -126,33 +124,6 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
     @PostConstruct
     @Transactional
     public void afterPropertiesSet() {
-        if (!usuarioRepository.existsByUsername("admin")) {
-            log.info("Creando usuario ADMIN por defecto...");
-            Usuario admin = Usuario.builder()
-                    .nombre("Administrador")
-                    .apellidos("Sistema")
-                    .username("admin")
-                    .email("admin@proyectocomida.es")
-                    .password(passwordEncoder.encode("admin123456"))
-                    .telefono("123456789")
-                    .direccion("Calle Principal 1")
-                    .codigoPostal("28001")
-                    .ciudad("Madrid")
-                    .pais("España")
-                    .roles(Set.of(Roles.ADMIN, Roles.USER))
-                    .isDeleted(false)
-                    .build();
-            Usuario adminGuardado = usuarioRepository.save(admin);
 
-            Carrito carritoVacio = Carrito.builder()
-                    .usuario(adminGuardado)
-                    .estado(Estados.Vacio)
-                    .codigoCupon(null)
-                    .descuento(0.0)
-                    .impuestosCalc(0.0)
-                    .total(0.0)
-                    .build();
-            carritoRepository.save(carritoVacio);
-        }
     }
 }

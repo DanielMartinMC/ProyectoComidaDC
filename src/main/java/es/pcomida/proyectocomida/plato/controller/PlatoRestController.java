@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -59,20 +60,24 @@ public class PlatoRestController {
         log.info("Buscando plato por id: {}", id);
         return ResponseEntity.ok(platosService.findById(id));
     }
+    
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlatoResponseDto> save(@Valid @RequestBody PlatoCreateDto platoCreateDto) {
         log.info("Guardando nuevo plato: {}", platoCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(platosService.save(platoCreateDto));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlatoResponseDto> update(@PathVariable Long id, @Valid @RequestBody PlatoUpdateDto platoUpdateDto) {
         log.info("Actualizando plato con id: {}", id);
         return ResponseEntity.ok(platosService.update(id, platoUpdateDto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Eliminando plato con id: {}", id);
         platosService.deleteById(id);

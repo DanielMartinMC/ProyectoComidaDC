@@ -16,16 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -41,6 +36,8 @@ public class PedidoRestController {
     public ResponseEntity<PageResponse<PedidoResponseDto>> getAll(
             @RequestParam(required = false) Optional<Long> usuario,
             @RequestParam(required = false) Optional<Estado> estado,
+            @RequestParam(required = false) Optional<Date>fechaDesde,
+            @RequestParam(required = false) Optional<Date>fechaHasta,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -52,7 +49,7 @@ public class PedidoRestController {
         Pageable pageable = PageRequest.of(page, size, sort);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
 
-        Page<PedidoResponseDto> pageResult = pedidosService.findAll(usuario, estado, pageable);
+        Page<PedidoResponseDto> pageResult = pedidosService.findAll(usuario, estado,fechaDesde,fechaHasta ,pageable);
 
         return ResponseEntity.ok()
                 .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
@@ -88,28 +85,6 @@ public class PedidoRestController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Borrando pedido por id: {}", id);
         pedidosService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-
-        BindingResult result = ex.getBindingResult();
-        problemDetail.setDetail("Falló la validación para el objeto='" + result.getObjectName()
-                + "'. " + "Núm. errores: " + result.getErrorCount());
-
-        Map<String, String> errores = new HashMap<>();
-        result.getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errores.put(fieldName, errorMessage);
-        });
-
-        problemDetail.setProperty("errores", errores);
-        return problemDetail;
+        return ResponseEntity.noContent().build();
     }
 }

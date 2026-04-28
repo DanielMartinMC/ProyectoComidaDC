@@ -1,9 +1,11 @@
 package es.pcomida.proyectocomida.pedido.models;
 
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+
 @Builder
 @ToString
 @Getter
@@ -27,8 +29,9 @@ public class Pedido {
     @Column(nullable = false)
     private Double total;
 
-    @Column(nullable = false)
-    private Long usuario;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Column(nullable = false)
     private String direccion;

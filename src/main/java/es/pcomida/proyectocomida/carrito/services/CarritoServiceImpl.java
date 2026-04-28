@@ -26,6 +26,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -43,19 +45,30 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     public Page<CarritoResponseDTO> findAll(Optional<Long> usuarioId, Optional<Estados> estado, Optional<Boolean> isDeleted, Pageable pageable) {
-        log.info("Buscando carritos con filtros: usuarioId={}, estado={}, isDeleted={}", usuarioId, estado, isDeleted);
+        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        // 1. Determinamos el ID final que usaremos para filtrar
+        final Long idParaFiltrar;
+
+        if (user.getRoles().stream().noneMatch(r -> r.name().equals("ADMIN"))) {
+            // Si no es ADMIN, forzamos que solo vea lo suyo
+            idParaFiltrar = user.getId();
+        } else {
+            // Si es ADMIN, usamos el que venga por parámetro o null si no viene nada
+            idParaFiltrar = usuarioId.orElse(null);
+        }
+
+        log.info("Buscando carritos con filtros: usuarioId={}, estado={}, isDeleted={}", idParaFiltrar, estado, isDeleted);
+
+        // 2. Usamos la variable final dentro de las especificaciones
         Specification<Carrito> specUsuario = (root, query, cb) ->
-                usuarioId.map(u -> cb.equal(root.get("usuario").get("id"), u))
-                        .orElseGet(() -> cb.isTrue(cb.literal(true)));
+                idParaFiltrar != null ? cb.equal(root.get("usuario").get("id"), idParaFiltrar) : null;
 
         Specification<Carrito> specEstado = (root, query, cb) ->
-                estado.map(e -> cb.equal(root.get("estado"), e))
-                        .orElseGet(() -> cb.isTrue(cb.literal(true)));
+                estado.isPresent() ? cb.equal(root.get("estado"), estado.get()) : null;
 
         Specification<Carrito> specIsDeleted = (root, query, cb) ->
-                isDeleted.map(d -> cb.equal(root.get("isDeleted"), d))
-                        .orElseGet(() -> cb.isTrue(cb.literal(true)));
+                isDeleted.isPresent() ? cb.equal(root.get("isDeleted"), isDeleted.get()) : null;
 
         Specification<Carrito> criterio = Specification.where(specUsuario)
                 .and(specEstado)
@@ -68,8 +81,10 @@ public class CarritoServiceImpl implements CarritoService {
     @Override
     @Cacheable(key = "#id")
     public CarritoResponseDTO findById(Long id) {
-        log.info("Buscando Carrito por id: " + id);
-        return carritoMapper.toCarritoResponseDTO(carritoRepository.findById(id).orElseThrow(() -> new CarritoNotFoundException(id)));
+        log.info("Buscando Carrito por id: {}", id);
+        Carrito carrito = carritoRepository.findById(id).orElseThrow(() -> new CarritoNotFoundException(id));
+        checkAdminOrOwner(carrito.getUsuario().getId());
+        return carritoMapper.toCarritoResponseDTO(carrito);
     }
 
     @Override
@@ -77,15 +92,15 @@ public class CarritoServiceImpl implements CarritoService {
     @CachePut(key = "#carritoId")
     public CarritoResponseDTO addPlatoToCarrito(Long carritoId, AddCarritoItemDTO itemDTO) {
         log.info("Añadiendo plato {} al carrito {}", itemDTO.getPlatoID(), carritoId);
-
         Carrito carritoActual = carritoRepository.findById(carritoId).orElseThrow(() -> new CarritoNotFoundException(carritoId));
+        checkAdminOrOwner(carritoActual.getUsuario().getId());
+
         Plato platoAdd = platosRepository.findById(itemDTO.getPlatoID()).orElseThrow(() -> new PlatoNotFoundException(itemDTO.getPlatoID()));
 
         var platoDuplicado = carritoItemRepository.findByCarritoIdAndPlatoId(carritoId, itemDTO.getPlatoID());
         if (platoDuplicado.isPresent()) {
             CarritoItem itemExist = platoDuplicado.get();
             itemExist.setCantidad(itemExist.getCantidad() + itemDTO.getCantidad());
-            // Actualizamos el precio unitario al actual por si ha cambiado (opcional, depende de la política de negocio)
             itemExist.setPrecioUnitario(platoAdd.getPrecio());
             carritoItemRepository.save(itemExist);
         } else {
@@ -93,7 +108,7 @@ public class CarritoServiceImpl implements CarritoService {
                     .carrito(carritoActual)
                     .plato(platoAdd)
                     .cantidad(itemDTO.getCantidad())
-                    .precioUnitario(platoAdd.getPrecio()) // Guardamos el precio actual
+                    .precioUnitario(platoAdd.getPrecio())
                     .build();
             carritoItemRepository.save(itemNew);
             carritoActual.getItems().add(itemNew);
@@ -109,9 +124,10 @@ public class CarritoServiceImpl implements CarritoService {
     @Transactional
     @CachePut(key = "#result.id")
     public CarritoResponseDTO save(CarritoCreateDto carritoCreateDto) {
-        log.info("Guardando Carrito: " + carritoCreateDto);
+        log.info("Guardando Carrito: {}", carritoCreateDto);
         Usuario usuario = usuarioRepository.findById(carritoCreateDto.getUsuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        checkAdminOrOwner(usuario.getId());
         
         Carrito nuevoCarrito = carritoMapper.toCarrito(carritoCreateDto, usuario);
         return carritoMapper.toCarritoResponseDTO(carritoRepository.save(nuevoCarrito));
@@ -121,8 +137,9 @@ public class CarritoServiceImpl implements CarritoService {
     @Transactional
     @CachePut(key = "#id")
     public CarritoResponseDTO update(Long id, CarritoUpdateDto carritoUpdateDto) {
-        log.info("Actualizando Carrito por id: " + id);
+        log.info("Actualizando Carrito por id: {}", id);
         Carrito carritoActual = carritoRepository.findById(id).orElseThrow(() -> new CarritoNotFoundException(id));
+        checkAdminOrOwner(carritoActual.getUsuario().getId());
         
         if (carritoUpdateDto.getCodigoCupon() != null) {
             carritoActual.setCodigoCupon(carritoUpdateDto.getCodigoCupon());
@@ -140,10 +157,9 @@ public class CarritoServiceImpl implements CarritoService {
     @Override
     @CacheEvict(key = "#id")
     public void deleteById(Long id) {
-        log.debug("Borrando Carrito por id: " + id);
-        if (!carritoRepository.existsById(id)) {
-            throw new CarritoNotFoundException(id);
-        }
+        log.debug("Borrando Carrito por id: {}", id);
+        Carrito carrito = carritoRepository.findById(id).orElseThrow(() -> new CarritoNotFoundException(id));
+        checkAdminOrOwner(carrito.getUsuario().getId());
         carritoRepository.deleteById(id);
     }
 
@@ -153,6 +169,7 @@ public class CarritoServiceImpl implements CarritoService {
     public void deleteItemFromCarrito(Long carritoId, Long id) {
         log.info("Borrando plato del carrito con id: {}", id);
         CarritoItem itemDelete = carritoItemRepository.findById(id).orElseThrow(() -> new PlatoNotFoundException(id));
+        checkAdminOrOwner(itemDelete.getCarrito().getUsuario().getId());
 
         if (!itemDelete.getCarrito().getId().equals(carritoId)) {
             throw new CarritoNotFoundException(carritoId);
@@ -167,5 +184,12 @@ public class CarritoServiceImpl implements CarritoService {
             carrito.setEstado(Estados.Vacio);
         }
         carritoRepository.save(carrito);
+    }
+
+    private void checkAdminOrOwner(Long ownerId) {
+        Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getRoles().stream().noneMatch(r -> r.name().equals("ADMIN")) && !user.getId().equals(ownerId)) {
+            throw new AccessDeniedException("No tienes permiso para realizar esta operación sobre un recurso que no te pertenece.");
+        }
     }
 }

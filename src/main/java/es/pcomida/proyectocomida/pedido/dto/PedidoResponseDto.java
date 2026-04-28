@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.pedido.dto;
 
 import es.pcomida.proyectocomida.pedido.models.Estado;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class PedidoResponseDto {
     private Date fechaPedido;
     private Estado estado;
     private Double total;
-    private Long usuario;
+    private Usuario usuario;
     private String direccion;
 
 }

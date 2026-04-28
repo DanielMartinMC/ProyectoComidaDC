@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,14 +22,14 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.version}/repartos") // En plural y minúscula por convención REST
+@RequestMapping("${api.version}/repartos")
 public class RepartoRestController {
 
     private final RepartoService repartoService;
     private final PaginationLinksUtils paginationLinksUtils;
 
-    // 1. Obtener todos los repartos (Para Administradores y Repartidores)
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<RepartoResponseDto>> getAll(
             @RequestParam(required = false) Optional<RepartoEstado> estado,
             @RequestParam(required = false) Optional<String> ciudad,
@@ -51,29 +52,29 @@ public class RepartoRestController {
                 .body(PageResponse.of(pageResult, sortBy, direction));
     }
 
-    // 2. Obtener un detalle (Para el Repartidor que va de camino)
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RepartoResponseDto> getById(@PathVariable Long id) {
         log.info("Buscando reparto por id: {}", id);
         return ResponseEntity.ok(repartoService.findById(id));
     }
 
-    // 3. Asignar un Repartidor (Lo hace el Administrador)
     @PatchMapping("/{id}/asignar/{repartidorId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RepartoResponseDto> asignarRepartidor(@PathVariable Long id, @PathVariable Long repartidorId) {
         log.info("Asignando el repartidor {} al reparto {}", repartidorId, id);
         return ResponseEntity.ok(repartoService.asignarRepartidor(id, repartidorId));
     }
 
-    // 4. Actualizar el estado del reparto (Lo hace el Repartidor en su app)
     @PatchMapping("/{id}/estado")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RepartoResponseDto> actualizarEstado(@PathVariable Long id, @RequestParam RepartoEstado nuevoEstado) {
         log.info("Actualizando estado del reparto {} a {}", id, nuevoEstado);
         return ResponseEntity.ok(repartoService.actualizarEstado(id, nuevoEstado));
     }
 
-    // 5. Obtener repartos de un repartidor
     @GetMapping("/repartidor/{repartidorId}")
+    @PreAuthorize("hasRole('ADMIN') ")
     public ResponseEntity<PageResponse<RepartoResponseDto>> getByRepartidor(
             @PathVariable Long repartidorId,
             @RequestParam(defaultValue = "0") int page,
@@ -94,8 +95,8 @@ public class RepartoRestController {
                 .body(PageResponse.of(pageResult, sortBy, direction));
     }
 
-    // 6. Obtener repartos de un usuario
     @GetMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('ADMIN') or #usuarioId == authentication.principal.id")
     public ResponseEntity<PageResponse<RepartoResponseDto>> getByUsuario(
             @PathVariable Long usuarioId,
             @RequestParam(defaultValue = "0") int page,

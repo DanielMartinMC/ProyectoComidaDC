@@ -1,6 +1,5 @@
 package es.pcomida.proyectocomida.usuario.controller;
 
-import es.pcomida.proyectocomida.usuario.dto.UsuarioCreateDTO;
 import es.pcomida.proyectocomida.usuario.dto.UsuarioResponseDTO;
 import es.pcomida.proyectocomida.usuario.dto.UsuarioUpdateDTO;
 import es.pcomida.proyectocomida.usuario.services.UsuarioService;
@@ -14,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -30,6 +31,7 @@ public class UsuarioRestController {
     private final PaginationLinksUtils paginationLinksUtils;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<UsuarioResponseDTO>> getAll(
             @RequestParam(required = false) Optional<String> username,
             @RequestParam(required = false) Optional<String> email,
@@ -40,7 +42,7 @@ public class UsuarioRestController {
             @RequestParam(defaultValue = "asc") String direction,
             HttpServletRequest request
     ) {
-        log.info("Buscando todos los usuarios con username: {}, email: {} e isDeleted: {}", username, email, isDeleted);
+        log.info("Buscando todos los usuarios con filtros");
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
@@ -51,24 +53,21 @@ public class UsuarioRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> getById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN') or #usuario.id == #id")
+    public ResponseEntity<UsuarioResponseDTO> getById(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         log.info("Buscando usuario por id: {}", id);
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> save(@Valid @RequestBody UsuarioCreateDTO usuarioCreateDTO) {
-        log.info("Guardando nuevo usuario: {}", usuarioCreateDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuarioCreateDTO));
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+    @PreAuthorize("hasRole('ADMIN') or #usuario.id == #id")
+    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO, @AuthenticationPrincipal Usuario usuario) {
         log.info("Actualizando usuario con id: {}", id);
         return ResponseEntity.ok(usuarioService.update(id, usuarioUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Eliminando usuario con id: {}", id);
         usuarioService.deleteById(id);

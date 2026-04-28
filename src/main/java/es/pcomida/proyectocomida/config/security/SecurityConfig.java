@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true) // Habilita el uso de @PreAuthorize
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -39,15 +39,26 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
+                        // 1. Rutas Públicas (Sin token)
                         .requestMatchers("/error/**").permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        
-                        // Rutas públicas de visualización
-                        .requestMatchers(HttpMethod.GET, "/api/v1/platos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/platos/**").permitAll()
 
-                        // El resto de peticiones requieren autenticación
+                        // 2. Rutas EXCLUSIVAS para el ADMIN
+                        // Solo admin puede ver la lista general de todos los usuarios
+                        .requestMatchers(HttpMethod.GET, "/v1/usuarios").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/usuarios/**").authenticated()
+                        // Solo admin puede ver la lista general de todos los carritos
+                        .requestMatchers(HttpMethod.GET, "/v1/carritos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/carritos/**").authenticated()
+                        // Solo admin puede crear, modificar o borrar platos
+                        .requestMatchers(HttpMethod.POST, "/v1/platos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/v1/platos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/platos/**").hasRole("ADMIN")
+
+                        // 3. El resto de peticiones requieren autenticación normal
+                        // (Ej: Un usuario normal viendo su propio perfil o modificando su propio carrito)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
