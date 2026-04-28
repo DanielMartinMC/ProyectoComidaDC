@@ -121,9 +121,19 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
         usuarioRepository.save(usuario);
     }
 
+    @Override
+    @Transactional
+    @CachePut(key = "#id")
+    public UsuarioResponseDTO subscribe(Long id) {
+        log.info("Suscribiendo al usuario con id: {}", id);
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNotFoundException(id));
+        usuario.setIsSuscriptor(true);
+        return usuarioMapper.toUsuarioResponseDTO(usuarioRepository.save(usuario));
+    }
+
     @PostConstruct
     @Transactional
     public void afterPropertiesSet() {
-
+        log.info("Inicializando datos de la aplicación...");
     }
 }

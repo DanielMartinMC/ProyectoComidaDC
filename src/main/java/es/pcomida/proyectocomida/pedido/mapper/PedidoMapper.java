@@ -1,12 +1,17 @@
 package es.pcomida.proyectocomida.pedido.mapper;
 
+import es.pcomida.proyectocomida.carrito.models.Carrito;
 import es.pcomida.proyectocomida.pedido.dto.PedidoCreateDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.pedido.models.Pedido;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PedidoMapper {
@@ -43,11 +48,21 @@ public class PedidoMapper {
                 .build();
     }
 
-    // Mapeamos de modelo a DTO (lista)
+    public Pedido toPedido(Carrito carrito) {
+        if (carrito == null) {
+            return null;
+        }
+        return Pedido.builder()
+                .usuario(carrito.getUsuario())
+                .direccion(carrito.getUsuario().getDireccion())
+                .total(carrito.getTotal())
+                .fechaPedido(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
+                .build();
+    }
+
     public List<PedidoResponseDto> toResponseDtoList(List<Pedido> pedidos) {
         return pedidos.stream()
                 .map(this::toPedidoResponseDto)
-                .toList();
+                .collect(Collectors.toList());
     }
-
 }

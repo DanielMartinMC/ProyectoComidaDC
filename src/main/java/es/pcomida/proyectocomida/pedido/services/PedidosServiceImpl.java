@@ -1,6 +1,10 @@
 package es.pcomida.proyectocomida.pedido.services;
 
-import es.pcomida.proyectocomida.pedido.dto.PedidoCreateDto;
+import es.pcomida.proyectocomida.carrito.exceptions.CarritoNotFoundException;
+import es.pcomida.proyectocomida.carrito.models.Carrito;
+import es.pcomida.proyectocomida.carrito.models.Estados;
+import es.pcomida.proyectocomida.carrito.repositories.CarritoRepository;
+import es.pcomida.proyectocomida.pedido.dto.CheckoutRequestDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.pedido.exceptions.PedidoNotFoundException;
@@ -9,6 +13,7 @@ import es.pcomida.proyectocomida.pedido.models.Estado;
 import es.pcomida.proyectocomida.pedido.models.Pedido;
 import es.pcomida.proyectocomida.pedido.repositories.PedidosRepository;
 import es.pcomida.proyectocomida.usuario.models.Usuario;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -32,27 +37,22 @@ import java.util.Optional;
 public class PedidosServiceImpl implements PedidosService {
     private final PedidosRepository pedidosRepository;
     private final PedidoMapper pedidoMapper;
+    private final CarritoRepository carritoRepository;
 
     @Override
     public Page<PedidoResponseDto> findAll(Optional<Long> usuarioId, Optional<Estado> estado, Optional<Date>fechaDesde, Optional<Date>fechaHasta ,Pageable pageable) {
         Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Solución definitiva:
-        // 1. Declaramos una variable FINAL para el ID que usaremos en la consulta.
         final Optional<Long> idUser;
 
-        // 2. Decidimos qué valor darle a esa variable UNA SOLA VEZ.
         if (user.getRoles().stream().anyMatch(r -> r.name().equals("ADMIN"))) {
-            // Si es ADMIN, usamos el ID que nos pasan como parámetro.
             idUser = usuarioId;
         } else {
-            // Si NO es ADMIN, ignoramos el parámetro y usamos su propio ID.
             idUser = Optional.of(user.getId());
         }
 
         log.info("Buscando pedidos con filtros: usuarioId={}, estado={}", idUser, estado);
 
-        // 3. Usamos la variable FINAL en la lambda. Ya no hay reasignación.
         Specification<Pedido> specUsuario = (root, query, cb) ->
                 idUser.map(u -> cb.equal(root.get("usuario").get("id"), u))
                         .orElseGet(() -> cb.isTrue(cb.literal(true)));
@@ -93,11 +93,26 @@ public class PedidosServiceImpl implements PedidosService {
     }
 
     @Override
+    @Transactional
     @CachePut(key = "#result.id")
-    public PedidoResponseDto save(PedidoCreateDto pedidoCreateDto) {
-        log.info("Guardando pedido: {}", pedidoCreateDto);
-        checkAdminOrOwner(pedidoCreateDto.getUsuario().getId());
-        Pedido nuevoPedido = pedidoMapper.toPedido(pedidoCreateDto);
+    public PedidoResponseDto save(CheckoutRequestDto checkoutRequestDto) {
+        log.info("Procesando checkout para el carrito id: {}", checkoutRequestDto.getCarritoId());
+
+        Carrito carrito = carritoRepository.findById(checkoutRequestDto.getCarritoId())
+                .orElseThrow(() -> new CarritoNotFoundException(checkoutRequestDto.getCarritoId()));
+
+        checkAdminOrOwner(carrito.getUsuario().getId());
+
+        if (carrito.getItems().isEmpty()) {
+            throw new IllegalStateException("El carrito está vacío, no se puede crear un pedido.");
+        }
+
+        Pedido nuevoPedido = pedidoMapper.toPedido(carrito);
+        nuevoPedido.setEstado(Estado.EnProceso);
+
+        carrito.setEstado(Estados.Contenido);
+        carritoRepository.save(carrito);
+
         return pedidoMapper.toPedidoResponseDto(pedidosRepository.save(nuevoPedido));
     }
 

@@ -70,14 +70,21 @@ public class Carrito {
 
     // Método helper para recalcular totales
     public void recalcularTotales() {
-        this.total = items.stream()
+        double subtotal = items.stream()
                 .mapToDouble(item -> item.getPlato().getPrecio() * item.getCantidad())
                 .sum();
-        
-        // Aplicar descuento si existe
-        if (this.descuento != null) {
-            this.total = Math.max(0.0, this.total - this.descuento);
+
+        // Aplicar descuento de suscriptor si el usuario lo es
+        if (this.usuario != null && this.usuario.getIsSuscriptor()) {
+            subtotal *= 0.85; // Aplica un 15% de descuento
         }
+
+        // Aplicar descuento por cupón si existe
+        if (this.descuento != null) {
+            subtotal = Math.max(0.0, subtotal - this.descuento);
+        }
+
+        this.total = subtotal;
         
         // Calcular impuestos (ejemplo 10%)
         this.impuestosCalc = this.total * 0.10; 

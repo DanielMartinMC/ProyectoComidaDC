@@ -5,5 +5,5 @@ public enum Estado {
     NoEnviado,
     EnProceso,
     Cancelado,
-    Entregado
+    Completado;
 }

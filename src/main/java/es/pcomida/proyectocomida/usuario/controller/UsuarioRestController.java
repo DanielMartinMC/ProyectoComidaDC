@@ -52,16 +52,37 @@ public class UsuarioRestController {
                 .body(PageResponse.of(pageResult, sortBy, direction));
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UsuarioResponseDTO> getMyProfile(@AuthenticationPrincipal Usuario usuario) {
+        log.info("Obteniendo perfil del usuario: {}", usuario.getUsername());
+        return ResponseEntity.ok(usuarioService.findById(usuario.getId()));
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UsuarioResponseDTO> updateMyProfile(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+        log.info("Actualizando perfil del usuario: {}", usuario.getUsername());
+        return ResponseEntity.ok(usuarioService.update(usuario.getId(), usuarioUpdateDTO));
+    }
+
+    @PostMapping("/me/suscribir")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UsuarioResponseDTO> subscribe(@AuthenticationPrincipal Usuario usuario) {
+        log.info("Suscribiendo al usuario: {}", usuario.getUsername());
+        return ResponseEntity.ok(usuarioService.subscribe(usuario.getId()));
+    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #usuario.id == #id")
-    public ResponseEntity<UsuarioResponseDTO> getById(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UsuarioResponseDTO> getById(@PathVariable Long id) {
         log.info("Buscando usuario por id: {}", id);
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #usuario.id == #id")
-    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO, @AuthenticationPrincipal Usuario usuario) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UsuarioResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
         log.info("Actualizando usuario con id: {}", id);
         return ResponseEntity.ok(usuarioService.update(id, usuarioUpdateDTO));
     }

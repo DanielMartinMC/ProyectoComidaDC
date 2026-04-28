@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.plato.dto.PlatoResponseDto;
 import es.pcomida.proyectocomida.plato.dto.PlatoUpdateDto;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.services.PlatosService;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import es.pcomida.proyectocomida.utils.pagination.PageResponse;
 import es.pcomida.proyectocomida.utils.pagination.PaginationLinksUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,14 +43,15 @@ public class PlatoRestController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction,
-            HttpServletRequest request
+            HttpServletRequest request,
+            @AuthenticationPrincipal Usuario usuario
     ) {
         log.info("Buscando todos los platos con filtros");
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
 
-        Page<PlatoResponseDto> pageResult = platosService.findAll(nombre, tipo, isDeleted, pageable);
+        Page<PlatoResponseDto> pageResult = platosService.findAll(nombre, tipo, isDeleted, pageable, usuario);
 
         return ResponseEntity.ok()
                 .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
@@ -60,7 +63,7 @@ public class PlatoRestController {
         log.info("Buscando plato por id: {}", id);
         return ResponseEntity.ok(platosService.findById(id));
     }
-    
+
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")

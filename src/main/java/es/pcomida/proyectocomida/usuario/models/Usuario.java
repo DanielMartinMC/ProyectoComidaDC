@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.usuario.models;
 
 import es.pcomida.proyectocomida.carrito.models.Carrito;
+import es.pcomida.proyectocomida.metodopago.models.MetodoPago;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -92,6 +93,13 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Carrito> carritos;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MetodoPago> metodosPago;
+
+    @OneToOne
+    @JoinColumn(name = "default_metodo_pago_id")
+    private MetodoPago metodoPagoPorDefecto;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

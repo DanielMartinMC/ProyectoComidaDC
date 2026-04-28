@@ -1,5 +1,6 @@
 package es.pcomida.proyectocomida.pedido.models;
 
+import es.pcomida.proyectocomida.metodopago.models.MetodoPago;
 import es.pcomida.proyectocomida.usuario.models.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,6 +36,10 @@ public class Pedido {
 
     @Column(nullable = false)
     private String direccion;
+
+    @ManyToOne
+    @JoinColumn(name = "metodo_pago_id")
+    private MetodoPago metodoPago;
 
     @Builder.Default
     private Boolean isDeleted = false;

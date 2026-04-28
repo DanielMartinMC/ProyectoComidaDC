@@ -8,6 +8,7 @@ import es.pcomida.proyectocomida.plato.mapper.PlatoMapper;
 import es.pcomida.proyectocomida.plato.models.Plato;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.repositories.PlatosRepository;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -30,7 +31,7 @@ public class PlatosServiceImpl implements PlatosService {
     private final PlatoMapper platoMapper;
 
     @Override
-    public Page<PlatoResponseDto> findAll(Optional<String> nombre, Optional<Tipo> tipo, Optional<Boolean> isDeleted, Pageable pageable) {
+    public Page<PlatoResponseDto> findAll(Optional<String> nombre, Optional<Tipo> tipo, Optional<Boolean> isDeleted, Pageable pageable, Usuario usuario) {
         log.info("Buscando platos con filtros: nombre={}, tipo={}, isDeleted={}", nombre, tipo, isDeleted);
 
         Specification<Plato> specNombre = (root, query, cb) ->
@@ -45,9 +46,17 @@ public class PlatosServiceImpl implements PlatosService {
                 isDeleted.map(d -> cb.equal(root.get("isDeleted"), d))
                         .orElseGet(() -> cb.isTrue(cb.literal(true)));
 
+        Specification<Plato> specIsPremium = (root, query, cb) -> {
+            if (usuario != null && (usuario.getIsSuscriptor() || usuario.getRoles().stream().anyMatch(r -> r.name().equals("ADMIN")))) {
+                return cb.isTrue(cb.literal(true));
+            }
+            return cb.equal(root.get("isPremium"), false);
+        };
+
         Specification<Plato> criterio = Specification.where(specNombre)
                 .and(specTipo)
-                .and(specIsDeleted);
+                .and(specIsDeleted)
+                .and(specIsPremium);
 
         Page<Plato> platoPage = platosRepository.findAll(criterio, pageable);
         return platoPage.map(platoMapper::toPlatoResponseDto);

@@ -1,6 +1,6 @@
 package es.pcomida.proyectocomida.pedido.controller;
 
-import es.pcomida.proyectocomida.pedido.dto.PedidoCreateDto;
+import es.pcomida.proyectocomida.pedido.dto.CheckoutRequestDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.pedido.models.Estado;
@@ -63,9 +63,9 @@ public class PedidoRestController {
     }
 
     @PostMapping
-    public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody PedidoCreateDto pedidoCreateDto) {
-        log.info("Creando pedido : {}", pedidoCreateDto);
-        var saved = pedidosService.save(pedidoCreateDto);
+    public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody CheckoutRequestDto checkoutRequestDto) {
+        log.info("Creando pedido desde carrito: {}", checkoutRequestDto.getCarritoId());
+        var saved = pedidosService.save(checkoutRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

@@ -1,9 +1,9 @@
 package es.pcomida.proyectocomida.pedido.services;
 
+import es.pcomida.proyectocomida.pedido.dto.CheckoutRequestDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.pedido.models.Estado;
-import es.pcomida.proyectocomida.pedido.dto.PedidoCreateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +15,7 @@ public interface PedidosService {
 
     PedidoResponseDto findById(Long id);
 
-    PedidoResponseDto save(PedidoCreateDto pedidoCreateDto);
+    PedidoResponseDto save(CheckoutRequestDto checkoutRequestDto);
 
     PedidoResponseDto update(Long id, PedidoUpdateDto pedidoUpdateDto);
 

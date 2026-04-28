@@ -46,4 +46,8 @@ public class Plato {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    @Builder.Default
+    @Column(columnDefinition = "boolean default false")
+    private boolean isPremium = false;
+
 }

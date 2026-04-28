@@ -17,7 +17,6 @@ public interface UsuarioService{
 
     UsuarioResponseDTO save(UsuarioCreateDTO usuarioCreateDTO);
 
-
     UsuarioResponseDTO update(Long id,UsuarioUpdateDTO usuarioUpdateDTO);
 
     //Borrado Fisico
@@ -26,10 +25,5 @@ public interface UsuarioService{
     //Borrado Lógico
     void softDeleteById(Long id);
 
-
-
-
-
-
-
+    UsuarioResponseDTO subscribe(Long id);
 }
