@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
 import es.pcomida.proyectocomida.pedido.models.Estado;
 import es.pcomida.proyectocomida.pedido.services.PedidosService;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import es.pcomida.proyectocomida.utils.pagination.PageResponse;
 import es.pcomida.proyectocomida.utils.pagination.PaginationLinksUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,13 +29,14 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @RestController // Es un controlador Rest
-@RequestMapping("api/${api.version}/pedidos") // Es la ruta del controlador (en plural minúscula por convención)
+@RequestMapping("${api.version}/pedidos") // Es la ruta del controlador (en plural minúscula por convención)
 public class PedidoRestController {
 
     private final PedidosService pedidosService;
     private final PaginationLinksUtils paginationLinksUtils;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PageResponse<PedidoResponseDto>> getAll(
             @RequestParam(required = false) Optional<Long> usuario,
             @RequestParam(required = false) Optional<Estado> estado,
@@ -42,8 +46,9 @@ public class PedidoRestController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
+            ) {
         log.info("Buscando todos los pedidos con filtros");
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -57,31 +62,34 @@ public class PedidoRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoResponseDto> getById(@PathVariable Long id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PedidoResponseDto> getById(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Buscando pedido por id={}", id);
         return ResponseEntity.ok(pedidosService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody CheckoutRequestDto checkoutRequestDto) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody CheckoutRequestDto checkoutRequestDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Creando pedido desde carrito: {}", checkoutRequestDto.getCarritoId());
         var saved = pedidosService.save(checkoutRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PedidoResponseDto> update(@PathVariable Long id, @Valid @RequestBody PedidoUpdateDto pedidoUpdateDto) {
+    public ResponseEntity<PedidoResponseDto> update(@PathVariable Long id, @Valid @RequestBody PedidoUpdateDto pedidoUpdateDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Actualizando pedido id={} con datos={}", id, pedidoUpdateDto);
         return ResponseEntity.ok(pedidosService.update(id, pedidoUpdateDto));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PedidoResponseDto> updatePartial(@PathVariable Long id, @Valid @RequestBody PedidoUpdateDto pedidoUpdateDto) {
+    public ResponseEntity<PedidoResponseDto> updatePartial(@PathVariable Long id, @Valid @RequestBody PedidoUpdateDto pedidoUpdateDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Actualizando parcialmente pedido con id={} con datos={}",id, pedidoUpdateDto);
         return ResponseEntity.ok(pedidosService.update(id, pedidoUpdateDto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Borrando pedido por id: {}", id);
         pedidosService.deleteById(id);

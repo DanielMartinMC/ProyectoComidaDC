@@ -35,20 +35,22 @@ import java.util.Optional;
 @Service
 @CacheConfig(cacheNames = "pedidos")
 public class PedidosServiceImpl implements PedidosService {
+
     private final PedidosRepository pedidosRepository;
     private final PedidoMapper pedidoMapper;
     private final CarritoRepository carritoRepository;
 
     @Override
-    public Page<PedidoResponseDto> findAll(Optional<Long> usuarioId, Optional<Estado> estado, Optional<Date>fechaDesde, Optional<Date>fechaHasta ,Pageable pageable) {
+    public Page<PedidoResponseDto> findAll(Optional<Long> usuarioId, Optional<Estado> estado,
+                                           Optional<Date> fechaDesde, Optional<Date> fechaHasta, Pageable pageable) {
+
         Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         final Optional<Long> idUser;
-
         if (user.getRoles().stream().anyMatch(r -> r.name().equals("ADMIN"))) {
-            idUser = usuarioId;
+            idUser = usuarioId; // Admin puede filtrar por cualquier usuario o ver todos
         } else {
-            idUser = Optional.of(user.getId());
+            idUser = Optional.of(user.getId()); // User solo ve los suyos siempre
         }
 
         log.info("Buscando pedidos con filtros: usuarioId={}, estado={}", idUser, estado);
@@ -61,14 +63,13 @@ public class PedidosServiceImpl implements PedidosService {
                 estado.map(e -> cb.equal(root.get("estado"), e))
                         .orElseGet(() -> cb.isTrue(cb.literal(true)));
 
-        Specification<Pedido>specFechaDesde =(root, query, cb) ->
-                fechaDesde.map(f -> cb.lessThanOrEqualTo(root.get("fechaPedido"),f ))
+        Specification<Pedido> specFechaDesde = (root, query, cb) ->
+                fechaDesde.map(f -> cb.lessThanOrEqualTo(root.get("fechaPedido"), f))
                         .orElseGet(() -> cb.isTrue(cb.literal(true)));
 
-        Specification<Pedido>specFechaHasta =(root, query, cb) ->
-                fechaHasta.map(f -> cb.greaterThanOrEqualTo(root.get("fechaPedido"),f))
+        Specification<Pedido> specFechaHasta = (root, query, cb) ->
+                fechaHasta.map(f -> cb.greaterThanOrEqualTo(root.get("fechaPedido"), f))
                         .orElseGet(() -> cb.isTrue(cb.literal(true)));
-
 
         Specification<Pedido> specIsDeleted = (root, query, cb) ->
                 cb.equal(root.get("isDeleted"), false);
@@ -79,15 +80,16 @@ public class PedidosServiceImpl implements PedidosService {
                 .and(specFechaHasta)
                 .and(specIsDeleted);
 
-        Page<Pedido> pedidoPage = pedidosRepository.findAll(criterio, pageable);
-        return pedidoPage.map(pedidoMapper::toPedidoResponseDto);
+        return pedidosRepository.findAll(criterio, pageable)
+                .map(pedidoMapper::toPedidoResponseDto);
     }
 
     @Override
     @Cacheable(key = "#id")
     public PedidoResponseDto findById(Long id) {
         log.info("Buscando pedido por id: {}", id);
-        Pedido pedido = pedidosRepository.findById(id).orElseThrow(() -> new PedidoNotFoundException(id));
+        Pedido pedido = pedidosRepository.findById(id)
+                .orElseThrow(() -> new PedidoNotFoundException(id));
         checkAdminOrOwner(pedido.getUsuario().getId());
         return pedidoMapper.toPedidoResponseDto(pedido);
     }
@@ -120,26 +122,36 @@ public class PedidosServiceImpl implements PedidosService {
     @CachePut(key = "#id")
     public PedidoResponseDto update(Long id, PedidoUpdateDto pedidoUpdateDto) {
         log.info("Actualizando pedido por id: {}", id);
-        Pedido pedidoActual = pedidosRepository.findById(id).orElseThrow(() -> new PedidoNotFoundException(id));
+        Pedido pedidoActual = pedidosRepository.findById(id)
+                .orElseThrow(() -> new PedidoNotFoundException(id));
         checkAdminOrOwner(pedidoActual.getUsuario().getId());
-        
+
         Pedido pedidoActualizado = pedidoMapper.toPedido(pedidoUpdateDto, pedidoActual);
         return pedidoMapper.toPedidoResponseDto(pedidosRepository.save(pedidoActualizado));
     }
 
     @Override
     @CacheEvict(key = "#id")
+    @Transactional
     public void deleteById(Long id) {
-        log.debug("Borrando pedido por id: {}", id);
-        Pedido pedido = pedidosRepository.findById(id).orElseThrow(() -> new PedidoNotFoundException(id));
+        log.debug("Borrando (soft delete) pedido por id: {}", id);
+        Pedido pedido = pedidosRepository.findById(id)
+                .orElseThrow(() -> new PedidoNotFoundException(id));
         checkAdminOrOwner(pedido.getUsuario().getId());
-        pedidosRepository.deleteById(id);
+
+        // ✅ Soft delete real en vez de borrado físico
+        pedido.setIsDeleted(true);
+        pedidosRepository.save(pedido);
     }
+
+    // --- Métodos privados ---
 
     private void checkAdminOrOwner(Long ownerId) {
         Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user.getRoles().stream().noneMatch(r -> r.name().equals("ADMIN")) && !user.getId().equals(ownerId)) {
-            throw new AccessDeniedException("No tienes permiso para realizar esta operación sobre un recurso que no te pertenece.");
+        if (user.getRoles().stream().noneMatch(r -> r.name().equals("ADMIN"))
+                && !user.getId().equals(ownerId)) {
+            throw new AccessDeniedException(
+                    "No tienes permiso para realizar esta operación sobre un recurso que no te pertenece.");
         }
     }
 }

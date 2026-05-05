@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -13,10 +14,11 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    // Hemos quitado la inyección de @Value para el diagnóstico.
-    // La clave y la expiración ahora están escritas directamente en el código.
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-    private final int jwtExpiration = 86400000; // 1 día en milisegundos
+    @Value("${jwt.expiration:86400000}")
+    private int jwtExpiration;
 
     @Override
     public String extractUserName(String token) {
@@ -60,10 +62,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private SecretKey getSigningKey() {
-        // SOLUCIÓN DE DIAGNÓSTICO:
-        // Escribimos la clave secreta directamente aquí para garantizar que es
-        // absolutamente la misma para firmar y para verificar.
-        String jwtSecret = "MeGustanLosTacosDeSuaperroPeroNoMeGustaLaSalsaVerdePorqueMePicaMuchoYMeHaceLlorar";
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 }

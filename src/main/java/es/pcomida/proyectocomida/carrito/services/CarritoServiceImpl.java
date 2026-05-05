@@ -156,11 +156,16 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     @CacheEvict(key = "#id")
+    @Transactional
     public void deleteById(Long id) {
-        log.debug("Borrando Carrito por id: {}", id);
-        Carrito carrito = carritoRepository.findById(id).orElseThrow(() -> new CarritoNotFoundException(id));
+        log.debug("Borrando (soft delete) Carrito por id: {}", id);
+        Carrito carrito = carritoRepository.findById(id)
+                .orElseThrow(() -> new CarritoNotFoundException(id));
         checkAdminOrOwner(carrito.getUsuario().getId());
-        carritoRepository.deleteById(id);
+
+        // Soft delete real — igual que el resto de entidades
+        carrito.setIsDeleted(true);
+        carritoRepository.save(carrito);
     }
 
     @Override

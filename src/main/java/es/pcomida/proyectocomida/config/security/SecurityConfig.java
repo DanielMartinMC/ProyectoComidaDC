@@ -14,14 +14,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Habilita el uso de @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Value("${spring.profiles.active:prod}")
+    private String activeProfile;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,39 +41,61 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Orígenes permitidos — ajusta el puerto según tu front
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:4200",  // Angular
+                "http://localhost:3000",  // React/Vue
+                "http://localhost:5173"   // Vite
+        ));
+
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setExposedHeaders(List.of("link")); // Para la paginación
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // 1. Rutas Públicas (Sin token)
-                        .requestMatchers("/error/**").permitAll()
-                        .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/platos/**").permitAll()
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/error/**").permitAll();
+                    auth.requestMatchers("/v1/auth/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/v1/platos/**").permitAll();
 
-                        // 2. Rutas EXCLUSIVAS para el ADMIN
-                        // Solo admin puede ver la lista general de todos los usuarios
-                        .requestMatchers(HttpMethod.GET, "/v1/usuarios").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/v1/usuarios/**").authenticated()
-                        // Solo admin puede ver la lista general de todos los carritos
-                        .requestMatchers(HttpMethod.GET, "/v1/carritos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/v1/carritos/**").authenticated()
-                        // Solo admin puede crear, modificar o borrar platos
-                        .requestMatchers(HttpMethod.POST, "/v1/platos/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/v1/platos/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/v1/platos/**").hasRole("ADMIN")
+                    // H2 Console solo en perfil dev
+                    if (activeProfile.contains("dev")) {
+                        auth.requestMatchers("/h2-console/**").permitAll();
+                    }
 
-                        // 3. El resto de peticiones requieren autenticación normal
-                        // (Ej: Un usuario normal viendo su propio perfil o modificando su propio carrito)
-                        .anyRequest().authenticated()
-                )
+                    // Rutas exclusivas ADMIN
+                    auth.requestMatchers(HttpMethod.GET, "/v1/usuarios").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.GET, "/v1/usuarios/**").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/v1/carritos").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.GET, "/v1/carritos/**").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/v1/platos/**").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.PUT, "/v1/platos/**").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.DELETE, "/v1/platos/**").hasRole("ADMIN");
+
+                    auth.anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
-        // Necesario para la consola H2
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+
+        // Solo habilitamos frameOptions para H2 en dev
+        if (activeProfile.contains("dev")) {
+            http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
+        }
 
         return http.build();
     }
