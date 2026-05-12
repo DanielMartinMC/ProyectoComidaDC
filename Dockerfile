@@ -1,0 +1,13 @@
+# Etapa 1: Build
+FROM maven:3.9-eclipse-temurin-25 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# Etapa 2: Runtime
+FROM eclipse-temurin:25-jre
+WORKDIR /app
+COPY --from=builder /app/target/ProyectoComida-*.jar app.jar
+EXPOSE 8080
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+
