@@ -1,3 +1,59 @@
-### Obtener todos los usuarios (paginado)
+### LOGIN - Obtener Token JWT (usuario admin)
+POST http://localhost:3000/v1/auth/signin
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password123456"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+###
+### Obtener todos los usuarios (paginado) - Requiere token JWT
 GET http://localhost:3000/v1/usuarios?page=0&size=5&sortBy=username&direction=asc
 Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+### Obtener todos los usuarios - Otro formato
+GET http://localhost:3000/v1/usuarios?page=0&size=10
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Obtener usuario por ID
+GET http://localhost:3000/v1/usuarios/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Obtener mi perfil (usuario autenticado)
+GET http://localhost:3000/v1/usuarios/me
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Actualizar mi perfil
+PUT http://localhost:3000/v1/usuarios/me
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Admin Plus",
+  "apellidos": "Sistema Actualizado",
+  "email": "admin.nuevo@proyectocomida.es"
+}
+
+### Actualizar usuario (requiere rol ADMIN)
+PUT http://localhost:3000/v1/usuarios/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Carlos Actualizado",
+  "email": "carlos.actualizado@test.com"
+}
+
+### Eliminar usuario
+DELETE http://localhost:3000/v1/usuarios/1
+Authorization: Bearer {{token}}
+
+

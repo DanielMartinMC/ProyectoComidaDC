@@ -1,3 +1,49 @@
-### Obtener todos los platos (paginado)
+### Obtener todos los platos (paginado) - Sin autenticación
 GET http://localhost:3000/v1/platos?page=0&size=5&sortBy=nombre&direction=asc
 Accept: application/json
+
+###
+GET http://localhost:3000/v1/platos?page=0&size=10
+Accept: application/json
+
+### Obtener plato por ID
+GET http://localhost:3000/v1/platos/1
+Accept: application/json
+
+### Filtrar platos por tipo
+GET http://localhost:3000/v1/platos?tipo=ALMUERZO&page=0&size=5
+Accept: application/json
+
+### Obtener platos no eliminados
+GET http://localhost:3000/v1/platos?isDeleted=false&page=0&size=10
+Accept: application/json
+
+### Crear nuevo plato (requiere rol ADMIN)
+POST http://localhost:3000/v1/platos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Pizza Margherita",
+  "descripcion": "Pizza tradicional con tomate, mozzarella y albahaca",
+  "tipo": "CENA",
+  "categoria": "PRINCIPAL",
+  "precio": 12.99,
+  "variante": "ESTANDAR",
+  "cantidad": 20,
+  "isPremium": false
+}
+
+### Actualizar plato (requiere rol ADMIN)
+PUT http://localhost:3000/v1/platos/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Ensalada César Actualizada",
+  "precio": 13.99
+}
+
+### Eliminar plato (requiere rol ADMIN)
+DELETE http://localhost:3000/v1/platos/1
+Authorization: Bearer {{token}}

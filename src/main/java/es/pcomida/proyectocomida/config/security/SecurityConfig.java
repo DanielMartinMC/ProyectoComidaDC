@@ -47,9 +47,7 @@ public class SecurityConfig {
 
         // Orígenes permitidos — ajusta el puerto según tu front
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200",  // Angular
-                "http://localhost:3000",  // React/Vue
-                "http://localhost:5173"   // Vite
+                "http://localhost:4200"  // Angular
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
