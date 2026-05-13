@@ -37,16 +37,11 @@ public class UserSignUpRequest {
     @NotBlank(message = "El teléfono no puede estar vacío")
     private String telefono;
 
-    @NotBlank(message = "La dirección no puede estar vacía")
     private String direccion;
 
-    @NotBlank(message = "El código postal no puede estar vacío")
-    @Length(min = 5, max = 5, message = "El código postal debe tener 5 dígitos")
     private String codigoPostal;
 
-    @NotBlank(message = "La ciudad no puede estar vacía")
     private String ciudad;
 
-    @NotBlank(message = "El país no puede estar vacío")
     private String pais;
 }

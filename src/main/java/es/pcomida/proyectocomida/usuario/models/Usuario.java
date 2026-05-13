@@ -48,7 +48,7 @@ public class Usuario implements UserDetails {
     private String email;
 
     @NotBlank(message = "EL telefono no puede estar vacio")
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String telefono;
 
     @NotBlank(message = "La password no puede estar vacía")

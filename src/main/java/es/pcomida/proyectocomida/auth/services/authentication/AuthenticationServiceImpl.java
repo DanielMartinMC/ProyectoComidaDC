@@ -45,10 +45,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .telefono(request.getTelefono())
-                .direccion(request.getDireccion())
-                .codigoPostal(request.getCodigoPostal())
-                .ciudad(request.getCiudad())
-                .pais(request.getPais())
+                .direccion(request.getDireccion() != null ? request.getDireccion() : "")
+                .codigoPostal(request.getCodigoPostal() != null ? request.getCodigoPostal() : "")
+                .ciudad(request.getCiudad() != null ? request.getCiudad() : "")
+                .pais(request.getPais() != null ? request.getPais() : "")
                 .roles(Set.of(Roles.USER)) // Por defecto, rol USER
                 .isDeleted(false)
                 .build();
