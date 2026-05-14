@@ -41,20 +41,21 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Orígenes permitidos — ajusta el puerto según tu front
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200",  // Angular
-                "https://proyecto-comida-zeta.vercel.app"  // la pondremos bien cuando tengas la URL de Vercel
-
+        // allowedOriginPatterns permite wildcards, cubriendo producción y todas las previews de Vercel
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:4200",
+                "https://proyecto-comida-zeta.vercel.app",
+                "https://proyecto-comida-*.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        configuration.setExposedHeaders(List.of("link")); // Para la paginación
+        configuration.setExposedHeaders(List.of("link"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -74,12 +75,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/v1/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/v1/platos/**").permitAll();
 
-                    // H2 Console solo en perfil dev
                     if (activeProfile.contains("dev")) {
                         auth.requestMatchers("/h2-console/**").permitAll();
                     }
 
-                    // Rutas exclusivas ADMIN
                     auth.requestMatchers(HttpMethod.GET, "/v1/usuarios").hasRole("ADMIN");
                     auth.requestMatchers(HttpMethod.GET, "/v1/usuarios/**").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/v1/carritos").hasRole("ADMIN");
@@ -92,7 +91,6 @@ public class SecurityConfig {
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Solo habilitamos frameOptions para H2 en dev
         if (activeProfile.contains("dev")) {
             http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         }
