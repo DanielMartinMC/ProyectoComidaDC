@@ -59,7 +59,6 @@ public class Usuario implements UserDetails {
     // Opcionales en el registro — se rellenan desde el perfil
     private String direccion;
 
-    @Length(min = 5, max = 5, message = "El código postal debe tener 5 dígitos")
     private String codigoPostal;
 
     private String ciudad;
