@@ -49,8 +49,8 @@ public class SecurityConfig {
         // allowedOriginPatterns permite wildcards, cubriendo producción y todas las previews de Vercel
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
-                "https://proyecto-comida-zeta.vercel.app",
-                "https://proyecto-comida-*.vercel.app"
+                "https://proyectocomida-*.vercel.app",
+                "https://proyectocomida-1.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
