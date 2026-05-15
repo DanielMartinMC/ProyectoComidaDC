@@ -1,6 +1,5 @@
 package es.pcomida.proyectocomida.plato.models;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +30,10 @@ public class Plato {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Pais pais;
 
     @Column(nullable = false)
     private Double precio;

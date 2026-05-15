@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.plato.dto;
 
 import es.pcomida.proyectocomida.plato.models.Categoria;
+import es.pcomida.proyectocomida.plato.models.Pais;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.models.Variante;
 import jakarta.validation.constraints.Min;
@@ -26,6 +27,9 @@ public class PlatoCreateDto {
     @NotNull(message = "La categoría no puede ser nula")
     private Categoria categoria;
 
+    @NotNull(message = "El país no puede ser nulo")
+    private Pais pais;
+
     @NotNull(message = "La variante no puede ser nula")
     private Variante variante;
 
@@ -36,4 +40,6 @@ public class PlatoCreateDto {
     @NotNull(message = "La cantidad no puede ser nula")
     @Min(value = 0, message = "La cantidad no puede ser negativa")
     private Integer cantidad;
+
+    private boolean isPremium;
 }

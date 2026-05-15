@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.plato.dto;
 
 import es.pcomida.proyectocomida.plato.models.Categoria;
+import es.pcomida.proyectocomida.plato.models.Pais;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.models.Variante;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,9 @@ public class PlatoResponseDto {
     private String descripcion;
     private Tipo tipo;
     private Categoria categoria;
+    private Pais pais;
     private Variante variante;
     private Double precio;
     private Integer cantidad;
+    private boolean isPremium;
 }

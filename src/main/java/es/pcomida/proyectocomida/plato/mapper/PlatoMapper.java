@@ -11,28 +11,31 @@ import java.util.List;
 @Component
 public class PlatoMapper {
 
-    public Plato toPlato(PlatoCreateDto platoCreateDto) {
+    public Plato toPlato(PlatoCreateDto dto) {
         return Plato.builder()
-                .nombre(platoCreateDto.getNombre())
-                .descripcion(platoCreateDto.getDescripcion())
-                .tipo(platoCreateDto.getTipo())
-                .categoria(platoCreateDto.getCategoria())
-                .variante(platoCreateDto.getVariante())
-                .precio(platoCreateDto.getPrecio())
-                .cantidad(platoCreateDto.getCantidad())
-                .isDeleted(false) // Por defecto al crear
+                .nombre(dto.getNombre())
+                .descripcion(dto.getDescripcion())
+                .tipo(dto.getTipo())
+                .categoria(dto.getCategoria())
+                .pais(dto.getPais())
+                .variante(dto.getVariante())
+                .precio(dto.getPrecio())
+                .cantidad(dto.getCantidad())
+                .isPremium(dto.isPremium())
+                .isDeleted(false)
                 .build();
     }
 
-    public Plato toPlato(PlatoUpdateDto platoUpdateDto, Plato plato) {
-        // No usamos el builder para no perder propiedades no incluidas en el DTO (como isDeleted)
-        plato.setNombre(platoUpdateDto.getNombre() != null ? platoUpdateDto.getNombre() : plato.getNombre());
-        plato.setDescripcion(platoUpdateDto.getDescripcion() != null ? platoUpdateDto.getDescripcion() : plato.getDescripcion());
-        plato.setPrecio(platoUpdateDto.getPrecio() != null ? platoUpdateDto.getPrecio() : plato.getPrecio());
-        plato.setCantidad(platoUpdateDto.getCantidad() != null ? platoUpdateDto.getCantidad() : plato.getCantidad());
-        plato.setCategoria(platoUpdateDto.getCategoria() != null ? platoUpdateDto.getCategoria() : plato.getCategoria());
-        plato.setVariante(platoUpdateDto.getVariante() != null ? platoUpdateDto.getVariante() : plato.getVariante());
-        plato.setTipo(platoUpdateDto.getTipo() != null ? platoUpdateDto.getTipo() : plato.getTipo());
+    public Plato toPlato(PlatoUpdateDto dto, Plato plato) {
+        plato.setNombre(dto.getNombre() != null ? dto.getNombre() : plato.getNombre());
+        plato.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion() : plato.getDescripcion());
+        plato.setPrecio(dto.getPrecio() != null ? dto.getPrecio() : plato.getPrecio());
+        plato.setCantidad(dto.getCantidad() != null ? dto.getCantidad() : plato.getCantidad());
+        plato.setCategoria(dto.getCategoria() != null ? dto.getCategoria() : plato.getCategoria());
+        plato.setVariante(dto.getVariante() != null ? dto.getVariante() : plato.getVariante());
+        plato.setTipo(dto.getTipo() != null ? dto.getTipo() : plato.getTipo());
+        plato.setPais(dto.getPais() != null ? dto.getPais() : plato.getPais());
+        if (dto.getIsPremium() != null) plato.setPremium(dto.getIsPremium());
         return plato;
     }
 
@@ -45,7 +48,9 @@ public class PlatoMapper {
                 .tipo(plato.getTipo())
                 .variante(plato.getVariante())
                 .categoria(plato.getCategoria())
+                .pais(plato.getPais())
                 .cantidad(plato.getCantidad())
+                .isPremium(plato.isPremium())
                 .build();
     }
 
