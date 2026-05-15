@@ -4,6 +4,8 @@ import es.pcomida.proyectocomida.metodopago.models.TipoMetodoPago;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class MetodoPagoDto {
@@ -12,4 +14,5 @@ public class MetodoPagoDto {
     private String numeroTarjeta;
     private String fechaExpiracion;
     private Boolean isDefault;
+    private BigDecimal saldoDisponible;
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
@@ -22,4 +23,6 @@ public class UsuarioResponseDTO {
     private String ciudad;
     private String pais;
     private Set<String> roles;
+    private Boolean isSuscriptor;
+    private LocalDateTime suscripcionExpira;
 }

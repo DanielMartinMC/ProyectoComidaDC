@@ -8,52 +8,39 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Builder
-@ToString
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(name = "METODOS_PAGO")
+@Builder @ToString @Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Entity @Table(name = "METODOS_PAGO")
 public class MetodoPago {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "El tipo de método de pago no puede ser nulo")
-    @Enumerated(EnumType.STRING)
+    @NotNull @Enumerated(EnumType.STRING)
     private TipoMetodoPago tipo;
 
-    @NotBlank(message = "El número de tarjeta no puede estar vacío")
-    @Column(nullable = false)
+    @NotBlank @Column(nullable = false)
     private String numeroTarjeta;
 
-    @NotBlank(message = "La fecha de expiración no puede estar vacía")
-    @Column(nullable = false)
+    @NotBlank @Column(nullable = false)
     private String fechaExpiracion;
 
-    @Column(columnDefinition = "boolean default false")
-    @Builder.Default
+    @Column(columnDefinition = "boolean default false") @Builder.Default
     private Boolean isDefault = false;
 
-    @Column(columnDefinition = "boolean default false")
-    @Builder.Default
+    @Column(nullable = false, precision = 10, scale = 2) @Builder.Default
+    private BigDecimal saldoDisponible = new BigDecimal("100.00");
+
+    @Column(columnDefinition = "boolean default false") @Builder.Default
     private Boolean isDeleted = false;
 
-    @CreationTimestamp
-    @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Builder.Default
+    @CreationTimestamp @Column(updatable = false, nullable = false) @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @UpdateTimestamp
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Builder.Default
+    @UpdateTimestamp @Column(nullable = false) @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
     private Usuario usuario;
 }

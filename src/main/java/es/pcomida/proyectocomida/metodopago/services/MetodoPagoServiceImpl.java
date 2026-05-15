@@ -12,8 +12,11 @@ import es.pcomida.proyectocomida.usuario.models.Usuario;
 import es.pcomida.proyectocomida.usuario.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,6 +120,24 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
 
         metodoPagoRepository.save(metodoPago);
         usuarioRepository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public MetodoPagoDto cobrar(Long id, BigDecimal monto, Usuario usuario) {
+        MetodoPago metodoPago = metodoPagoRepository.findByIdAndUsuarioIdAndIsDeletedFalse(id, usuario.getId())
+                .orElseThrow(() -> new MetodoPagoNotFoundException(id));
+
+        if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El monto debe ser mayor que 0");
+        }
+
+        if (metodoPago.getSaldoDisponible().compareTo(monto) < 0) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo insuficiente");
+        }
+
+        metodoPago.setSaldoDisponible(metodoPago.getSaldoDisponible().subtract(monto));
+        return metodoPagoMapper.toMetodoPagoDto(metodoPagoRepository.save(metodoPago));
     }
 
     private void validateAndMaskNumeroTarjeta(String numero) {

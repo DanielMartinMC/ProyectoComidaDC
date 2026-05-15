@@ -67,7 +67,17 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
     @Override
     public UsuarioResponseDTO findById(Long id) {
         log.info("Buscando Usuarios por id: " + id);
-        return usuarioMapper.toUsuarioResponseDTO(usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNotFoundException(id)));
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
+        // Auto-expirar suscripción si ha caducado
+        if (Boolean.TRUE.equals(usuario.getIsSuscriptor())
+                && usuario.getSuscripcionExpira() != null
+                && LocalDateTime.now().isAfter(usuario.getSuscripcionExpira())) {
+            usuario.setIsSuscriptor(false);
+            usuario.setSuscripcionExpira(null);
+            usuarioRepository.save(usuario);
+        }
+        return usuarioMapper.toUsuarioResponseDTO(usuario);
     }
 
     @Override
@@ -126,8 +136,10 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
     @CachePut(key = "#id")
     public UsuarioResponseDTO subscribe(Long id) {
         log.info("Suscribiendo al usuario con id: {}", id);
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNotFoundException(id));
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
         usuario.setIsSuscriptor(true);
+        usuario.setSuscripcionExpira(LocalDateTime.now().plusMonths(1));
         return usuarioMapper.toUsuarioResponseDTO(usuarioRepository.save(usuario));
     }
 

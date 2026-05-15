@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${api.version}/metodos-pago")
@@ -51,5 +53,14 @@ public class MetodoPagoRestController {
     public ResponseEntity<Void> setDefaultMetodoPago(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         metodoPagoService.setDefaultMetodoPago(id, usuario);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/cobrar")
+    public ResponseEntity<MetodoPagoDto> cobrar(
+            @PathVariable Long id,
+            @RequestBody Map<String, BigDecimal> body,
+            @AuthenticationPrincipal Usuario usuario) {
+        BigDecimal monto = body.get("monto");
+        return ResponseEntity.ok(metodoPagoService.cobrar(id, monto, usuario));
     }
 }

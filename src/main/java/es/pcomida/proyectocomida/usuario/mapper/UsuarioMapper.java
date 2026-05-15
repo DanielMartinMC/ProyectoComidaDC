@@ -49,6 +49,9 @@ public class UsuarioMapper {
                 .codigoPostal(updateDTO.getCodigoPostal()  != null ? updateDTO.getCodigoPostal() : usuario.getCodigoPostal())
                 .ciudad(updateDTO.getCiudad() != null ? updateDTO.getCiudad() : usuario.getCiudad())
                 .pais(updateDTO.getPais() != null ? updateDTO.getPais() : usuario.getPais())
+                .roles(usuario.getRoles())
+                .isSuscriptor(usuario.getIsSuscriptor())
+                .suscripcionExpira(usuario.getSuscripcionExpira())
                 .build();
     }
 
@@ -64,6 +67,8 @@ public class UsuarioMapper {
                 .ciudad(usuario.getCiudad())
                 .pais(usuario.getPais())
                 .roles(usuario.getRoles().stream().map(Enum::name).collect(Collectors.toSet()))
+                .isSuscriptor(usuario.getIsSuscriptor())
+                .suscripcionExpira(usuario.getSuscripcionExpira())
                 .build();
     }
 

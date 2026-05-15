@@ -87,6 +87,9 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private Boolean isSuscriptor = false;
 
+    @Column
+    private LocalDateTime suscripcionExpira;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Carrito> carritos;
 

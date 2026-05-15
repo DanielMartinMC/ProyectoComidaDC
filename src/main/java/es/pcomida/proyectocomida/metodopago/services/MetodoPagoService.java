@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.metodopago.dto.MetodoPagoDto;
 import es.pcomida.proyectocomida.metodopago.dto.MetodoPagoUpdateDto;
 import es.pcomida.proyectocomida.usuario.models.Usuario;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface MetodoPagoService {
@@ -14,4 +15,5 @@ public interface MetodoPagoService {
     MetodoPagoDto updateMetodoPago(Long id, MetodoPagoUpdateDto metodoPagoUpdateDto, Usuario usuario);
     void deleteMetodoPago(Long id, Usuario usuario);
     void setDefaultMetodoPago(Long id, Usuario usuario);
+    MetodoPagoDto cobrar(Long id, BigDecimal monto, Usuario usuario);
 }
