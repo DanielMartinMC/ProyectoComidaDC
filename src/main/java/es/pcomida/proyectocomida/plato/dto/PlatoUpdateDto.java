@@ -6,11 +6,15 @@ import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.models.Variante;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PlatoUpdateDto {
 
     private String nombre;

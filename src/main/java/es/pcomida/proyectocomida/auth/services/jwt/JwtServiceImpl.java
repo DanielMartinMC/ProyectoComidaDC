@@ -3,12 +3,14 @@ package es.pcomida.proyectocomida.auth.services.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -27,11 +29,17 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        Date now = new Date();
+        Date now        = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
+
+        // Extraemos los roles como lista de strings: ["ROLE_ADMIN"], ["ROLE_USER"]...
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("roles", roles)          // ← roles incluidos en el token
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
