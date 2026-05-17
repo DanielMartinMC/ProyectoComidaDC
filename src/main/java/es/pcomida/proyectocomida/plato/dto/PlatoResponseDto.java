@@ -1,10 +1,10 @@
 package es.pcomida.proyectocomida.plato.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import es.pcomida.proyectocomida.plato.models.Categoria;
 import es.pcomida.proyectocomida.plato.models.Pais;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.models.Variante;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +24,7 @@ public class PlatoResponseDto {
     private Variante variante;
     private Double precio;
     private Integer cantidad;
+    private String imageUrl;
 
     @JsonProperty("isPremium")
     private boolean isPremium;

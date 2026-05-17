@@ -5,12 +5,14 @@ import es.pcomida.proyectocomida.auth.dto.UserSignInRequest;
 import es.pcomida.proyectocomida.auth.dto.UserSignUpRequest;
 import es.pcomida.proyectocomida.auth.exceptions.AuthDifferentPasswords;
 import es.pcomida.proyectocomida.auth.exceptions.AuthExistingUsernameOrEmail;
+import es.pcomida.proyectocomida.auth.exceptions.AuthSignInNotValid;
 import es.pcomida.proyectocomida.auth.repositories.AuthUserRepository;
 import es.pcomida.proyectocomida.auth.services.jwt.JwtService;
 import es.pcomida.proyectocomida.usuario.models.Roles;
 import es.pcomida.proyectocomida.usuario.models.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .codigoPostal(request.getCodigoPostal() != null ? request.getCodigoPostal() : "")
                 .ciudad(request.getCiudad() != null ? request.getCiudad() : "")
                 .pais(request.getPais() != null ? request.getPais() : "")
-                .roles(Set.of(Roles.USER)) // Por defecto, rol USER
+                .roles(Set.of(Roles.USER))
                 .isDeleted(false)
                 .build();
 
@@ -60,11 +62,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public JwtAuthResponse signIn(UserSignInRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            throw new AuthSignInNotValid("Credenciales erróneas");
+        }
         var user = authUserRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+                .orElseThrow(() -> new AuthSignInNotValid("Usuario no encontrado"));
         var jwtToken = jwtService.generateToken(user);
         return JwtAuthResponse.builder().token(jwtToken).build();
     }

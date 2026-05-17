@@ -50,7 +50,7 @@ public class PlatosServiceImpl implements PlatosService {
             if (usuario != null && (usuario.getIsSuscriptor() || usuario.getRoles().stream().anyMatch(r -> r.name().equals("ADMIN")))) {
                 return cb.isTrue(cb.literal(true));
             }
-            return cb.equal(root.get("isPremium"), false);
+            return cb.equal(root.get("premium"), false);
         };
 
         Specification<Plato> criterio = Specification.where(specNombre)

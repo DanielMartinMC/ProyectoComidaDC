@@ -1,5 +1,6 @@
 package es.pcomida.proyectocomida.plato.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -51,6 +52,9 @@ public class Plato {
 
     @Builder.Default
     @Column(columnDefinition = "boolean default false")
-    private boolean isPremium = false;
+    @JsonProperty("isPremium")
+    private boolean premium = false;
 
+    @Column(length = 500)
+    private String imageUrl;
 }
