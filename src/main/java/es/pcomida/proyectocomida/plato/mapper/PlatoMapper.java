@@ -22,7 +22,6 @@ public class PlatoMapper {
                 .precio(dto.getPrecio())
                 .cantidad(dto.getCantidad())
                 .premium(dto.isPremium())
-                .imageUrl(dto.getImageUrl())
                 .isDeleted(false)
                 .build();
     }
@@ -37,7 +36,6 @@ public class PlatoMapper {
         plato.setTipo(dto.getTipo() != null ? dto.getTipo() : plato.getTipo());
         plato.setPais(dto.getPais() != null ? dto.getPais() : plato.getPais());
         if (dto.getIsPremium() != null) plato.setPremium(dto.getIsPremium());
-        if (dto.getImageUrl() != null) plato.setImageUrl(dto.getImageUrl());
         return plato;
     }
 
@@ -53,7 +51,6 @@ public class PlatoMapper {
                 .pais(plato.getPais())
                 .cantidad(plato.getCantidad())
                 .isPremium(plato.isPremium())
-                .imageUrl(plato.getImageUrl())
                 .build();
     }
 

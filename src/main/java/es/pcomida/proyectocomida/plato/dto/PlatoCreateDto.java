@@ -4,10 +4,12 @@ import es.pcomida.proyectocomida.plato.models.Categoria;
 import es.pcomida.proyectocomida.plato.models.Pais;
 import es.pcomida.proyectocomida.plato.models.Tipo;
 import es.pcomida.proyectocomida.plato.models.Variante;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
 
 @Builder
 @Data
@@ -40,8 +42,4 @@ public class PlatoCreateDto {
     private Integer cantidad;
 
     private boolean isPremium;
-
-    @URL(message = "La imagen debe ser una URL válida")
-    @Size(max = 500, message = "La URL de la imagen no puede superar 500 caracteres")
-    private String imageUrl;
 }
