@@ -63,6 +63,7 @@ public class UsuarioRestController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> updateMyProfile(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
         log.info("Actualizando perfil del usuario: {}", usuario.getUsername());
+        log.info("Datos recibidos: {}", usuarioUpdateDTO);
         return ResponseEntity.ok(usuarioService.update(usuario.getId(), usuarioUpdateDTO));
     }
 

@@ -36,23 +36,38 @@ public class UsuarioMapper {
 
 
     }
-    public Usuario toUsuario(UsuarioUpdateDTO updateDTO,Usuario usuario){
-        return Usuario.builder()
-                .id(usuario.getId())
-                .nombre(updateDTO.getNombre() != null ? updateDTO.getNombre() : usuario.getNombre())
-                .apellidos(updateDTO.getApellidos() != null ? updateDTO.getApellidos(): usuario.getApellidos())
-                .username(updateDTO.getUsername() != null ? updateDTO.getUsername() : usuario.getUsername())
-                .email(updateDTO.getEmail() != null ? updateDTO.getEmail() : usuario.getEmail())
-                .telefono(updateDTO.getTelefono() != null ? updateDTO.getTelefono() : usuario.getTelefono())
-                .password(updateDTO.getPassword() != null ? updateDTO.getPassword() : usuario.getPassword())
-                .direccion(updateDTO.getDireccion()  != null ? updateDTO.getDireccion() : usuario.getDireccion())
-                .codigoPostal(updateDTO.getCodigoPostal()  != null ? updateDTO.getCodigoPostal() : usuario.getCodigoPostal())
-                .ciudad(updateDTO.getCiudad() != null ? updateDTO.getCiudad() : usuario.getCiudad())
-                .pais(updateDTO.getPais() != null ? updateDTO.getPais() : usuario.getPais())
-                .roles(usuario.getRoles())
-                .isSuscriptor(usuario.getIsSuscriptor())
-                .suscripcionExpira(usuario.getSuscripcionExpira())
-                .build();
+    public Usuario toUsuario(UsuarioUpdateDTO updateDTO, Usuario usuario) {
+        if (updateDTO.getNombre() != null) {
+            usuario.setNombre(updateDTO.getNombre());
+        }
+        if (updateDTO.getApellidos() != null) {
+            usuario.setApellidos(updateDTO.getApellidos());
+        }
+        if (updateDTO.getUsername() != null) {
+            usuario.setUsername(updateDTO.getUsername());
+        }
+        if (updateDTO.getEmail() != null) {
+            usuario.setEmail(updateDTO.getEmail());
+        }
+        if (updateDTO.getTelefono() != null) {
+            usuario.setTelefono(updateDTO.getTelefono());
+        }
+        if (updateDTO.getPassword() != null) {
+            usuario.setPassword(updateDTO.getPassword());
+        }
+        if (updateDTO.getDireccion() != null) {
+            usuario.setDireccion(updateDTO.getDireccion());
+        }
+        if (updateDTO.getCodigoPostal() != null) {
+            usuario.setCodigoPostal(updateDTO.getCodigoPostal());
+        }
+        if (updateDTO.getCiudad() != null) {
+            usuario.setCiudad(updateDTO.getCiudad());
+        }
+        if (updateDTO.getPais() != null) {
+            usuario.setPais(updateDTO.getPais());
+        }
+        return usuario;
     }
 
     public UsuarioResponseDTO toUsuarioResponseDTO(Usuario usuario){

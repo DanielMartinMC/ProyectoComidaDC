@@ -6,6 +6,7 @@ import es.pcomida.proyectocomida.carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.carrito.models.Estados;
 import es.pcomida.proyectocomida.carrito.services.CarritoService;
 import es.pcomida.proyectocomida.carritoitem.dto.AddCarritoItemDTO;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import es.pcomida.proyectocomida.utils.pagination.PageResponse;
 import es.pcomida.proyectocomida.utils.pagination.PaginationLinksUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -68,9 +70,9 @@ public class CarritoRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CarritoResponseDTO> create(@Valid @RequestBody CarritoCreateDto carritoCreateDto) {
-        log.info("Creando Carrito : {}", carritoCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(carritoService.save(carritoCreateDto));
+    public ResponseEntity<CarritoResponseDTO> create(@Valid @RequestBody CarritoCreateDto carritoCreateDto, @AuthenticationPrincipal Usuario usuario) {
+        log.info("Creando Carrito para el usuario: {}", usuario.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(carritoService.save(carritoCreateDto, usuario));
     }
 
     @PutMapping("/{id}")

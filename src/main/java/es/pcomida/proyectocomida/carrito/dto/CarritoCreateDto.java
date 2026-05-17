@@ -1,12 +1,10 @@
 package es.pcomida.proyectocomida.carrito.dto;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class CarritoCreateDto {
-    @NotNull(message = "El id de usuario no puede ser nulo")
-    private Long usuarioId;
+    // No se necesita ningún campo. El usuario se obtendrá del token.
 }

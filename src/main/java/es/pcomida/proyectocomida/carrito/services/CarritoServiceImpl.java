@@ -123,10 +123,8 @@ public class CarritoServiceImpl implements CarritoService {
     @Override
     @Transactional
     @CachePut(key = "#result.id")
-    public CarritoResponseDTO save(CarritoCreateDto carritoCreateDto) {
-        log.info("Guardando Carrito: {}", carritoCreateDto);
-        Usuario usuario = usuarioRepository.findById(carritoCreateDto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public CarritoResponseDTO save(CarritoCreateDto carritoCreateDto, Usuario usuario) {
+        log.info("Guardando Carrito para el usuario: {}", usuario.getUsername());
         checkAdminOrOwner(usuario.getId());
         
         Carrito nuevoCarrito = carritoMapper.toCarrito(carritoCreateDto, usuario);

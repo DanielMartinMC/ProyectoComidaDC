@@ -5,6 +5,7 @@ import es.pcomida.proyectocomida.carrito.dto.CarritoResponseDTO;
 import es.pcomida.proyectocomida.carrito.dto.CarritoUpdateDto;
 import es.pcomida.proyectocomida.carrito.models.Estados;
 import es.pcomida.proyectocomida.carritoitem.dto.AddCarritoItemDTO;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +18,7 @@ public interface CarritoService {
 
     CarritoResponseDTO addPlatoToCarrito(Long carritoId, AddCarritoItemDTO itemDTO);
 
-    CarritoResponseDTO save(CarritoCreateDto carritoCreateDto);
+    CarritoResponseDTO save(CarritoCreateDto carritoCreateDto, Usuario usuario);
 
     CarritoResponseDTO update(Long id, CarritoUpdateDto carritoUpdateDto);
 

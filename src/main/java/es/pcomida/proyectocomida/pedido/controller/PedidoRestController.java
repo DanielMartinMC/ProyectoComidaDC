@@ -69,7 +69,6 @@ public class PedidoRestController {
     }
 
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody CheckoutRequestDto checkoutRequestDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Creando pedido desde carrito: {}", checkoutRequestDto.getCarritoId());
         var saved = pedidosService.save(checkoutRequestDto);
