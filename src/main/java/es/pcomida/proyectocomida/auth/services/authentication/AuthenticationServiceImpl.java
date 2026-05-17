@@ -12,7 +12,7 @@ import es.pcomida.proyectocomida.usuario.models.Roles;
 import es.pcomida.proyectocomida.usuario.models.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
-        } catch (BadCredentialsException e) {
+        } catch (AuthenticationException e) {
             throw new AuthSignInNotValid("Credenciales erróneas");
         }
         var user = authUserRepository.findByUsername(request.getUsername())
