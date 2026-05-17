@@ -168,7 +168,7 @@ class PlatoMapperTest {
                 .variante(Variante.ESTANDAR)
                 .precio(18.5)
                 .cantidad(30)
-                .isPremium(false)
+                .premium(false)
                 .build();
 
         PlatoResponseDto result = platoMapper.toPlatoResponseDto(plato);
