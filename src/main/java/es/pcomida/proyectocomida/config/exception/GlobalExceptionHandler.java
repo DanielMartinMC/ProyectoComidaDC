@@ -4,6 +4,7 @@ import es.pcomida.proyectocomida.auth.exceptions.AuthExistingUsernameOrEmail;
 import es.pcomida.proyectocomida.auth.exceptions.AuthException;
 import es.pcomida.proyectocomida.auth.exceptions.AuthSignInNotValid;
 import es.pcomida.proyectocomida.carrito.exceptions.CarritoNotFoundException;
+import es.pcomida.proyectocomida.metodopago.exceptions.MetodoPagoNotFoundException;
 import es.pcomida.proyectocomida.plato.exceptions.PlatoNotFoundException;
 import es.pcomida.proyectocomida.pedido.exceptions.PedidoNotFoundException;
 import es.pcomida.proyectocomida.reparto.exceptions.RepartoNotFoundException;
@@ -76,7 +77,8 @@ public class GlobalExceptionHandler {
             PlatoNotFoundException.class,
             PedidoNotFoundException.class,
             RepartoNotFoundException.class,
-            UsuarioNotFoundException.class
+            UsuarioNotFoundException.class,
+            MetodoPagoNotFoundException.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponseDto> handleNotFoundExceptions(RuntimeException ex, HttpServletRequest request) {
