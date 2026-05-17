@@ -1,5 +1,6 @@
 package es.pcomida.proyectocomida.config.exception;
 
+import es.pcomida.proyectocomida.auth.exceptions.AuthExistingUsernameOrEmail;
 import es.pcomida.proyectocomida.auth.exceptions.AuthException;
 import es.pcomida.proyectocomida.auth.exceptions.AuthSignInNotValid;
 import es.pcomida.proyectocomida.carrito.exceptions.CarritoNotFoundException;
@@ -91,7 +92,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UsuarioBadRequestException.class,
-            AuthException.class
+            AuthException.class,
+            AuthExistingUsernameOrEmail.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponseDto> handleBadRequestExceptions(RuntimeException ex, HttpServletRequest request) {

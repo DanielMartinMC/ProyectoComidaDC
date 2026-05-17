@@ -34,10 +34,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AuthDifferentPasswords("Las contraseñas no coinciden");
         }
         if (authUserRepository.existsByUsername(request.getUsername())) {
-            throw new AuthExistingUsernameOrEmail("El nombre de usuario ya está en uso");
+            throw new AuthExistingUsernameOrEmail("El nombre de usuario ya está en uso.");
         }
         if (authUserRepository.existsByEmail(request.getEmail())) {
-            throw new AuthExistingUsernameOrEmail("El email ya está en uso");
+            throw new AuthExistingUsernameOrEmail("El email ya está registrado en el sistema.");
         }
 
         var user = Usuario.builder()
