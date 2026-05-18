@@ -58,11 +58,8 @@ public class Usuario implements UserDetails {
 
     // Opcionales en el registro — se rellenan desde el perfil
     private String direccion;
-
     private String codigoPostal;
-
     private String ciudad;
-
     private String pais;
 
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

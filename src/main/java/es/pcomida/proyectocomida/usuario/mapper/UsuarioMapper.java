@@ -33,9 +33,8 @@ public class UsuarioMapper {
                 .updatedAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
                 .build();
-
-
     }
+
     public Usuario toUsuario(UsuarioUpdateDTO updateDTO, Usuario usuario) {
         if (updateDTO.getNombre() != null) {
             usuario.setNombre(updateDTO.getNombre());
@@ -89,6 +88,5 @@ public class UsuarioMapper {
 
     public List<UsuarioResponseDTO> toResponseDTOlist(List<Usuario> usuarios){
         return usuarios.stream().map(this::toUsuarioResponseDTO).toList();
-
     }
 }

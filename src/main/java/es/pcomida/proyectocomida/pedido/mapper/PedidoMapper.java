@@ -1,6 +1,7 @@
 package es.pcomida.proyectocomida.pedido.mapper;
 
 import es.pcomida.proyectocomida.carrito.models.Carrito;
+import es.pcomida.proyectocomida.metodopago.models.MetodoPago;
 import es.pcomida.proyectocomida.pedido.dto.PedidoItemResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
@@ -17,15 +18,17 @@ import java.util.stream.Collectors;
 @Component
 public class PedidoMapper {
 
-    public Pedido toPedido(Carrito carrito) {
+    public Pedido toPedido(Carrito carrito, MetodoPago metodoPago) {
         if (carrito == null) {
             return null;
         }
+
         Pedido pedido = Pedido.builder()
                 .usuario(carrito.getUsuario())
                 .direccion(carrito.getUsuario().getDireccion())
                 .total(carrito.getTotal())
                 .fechaPedido(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
+                .metodoPago(metodoPago)
                 .build();
 
         List<PedidoItem> pedidoItems = carrito.getItems().stream()
@@ -36,6 +39,7 @@ public class PedidoMapper {
                         .pedido(pedido)
                         .build())
                 .collect(Collectors.toList());
+
         pedido.setPedidoItems(pedidoItems);
         return pedido;
     }
@@ -73,6 +77,7 @@ public class PedidoMapper {
                 .total(pedido.getTotal())
                 .pedidoItems(itemDtos)
                 .direccion(pedido.getDireccion())
+                .metodoPagoId(pedido.getMetodoPago() != null ? pedido.getMetodoPago().getId() : null)
                 .build();
     }
 

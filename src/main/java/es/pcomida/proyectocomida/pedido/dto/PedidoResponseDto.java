@@ -17,4 +17,5 @@ public class PedidoResponseDto {
     private Double total;
     private List<PedidoItemResponseDto> pedidoItems;
     private String direccion;
+    private Long metodoPagoId;
 }

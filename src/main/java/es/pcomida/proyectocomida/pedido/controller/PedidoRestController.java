@@ -28,8 +28,8 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController // Es un controlador Rest
-@RequestMapping("${api.version}/pedidos") // Es la ruta del controlador (en plural minúscula por convención)
+@RestController
+@RequestMapping("${api.version}/pedidos")
 public class PedidoRestController {
 
     private final PedidosService pedidosService;
@@ -40,21 +40,21 @@ public class PedidoRestController {
     public ResponseEntity<PageResponse<PedidoResponseDto>> getAll(
             @RequestParam(required = false) Optional<Long> usuario,
             @RequestParam(required = false) Optional<Estado> estado,
-            @RequestParam(required = false) Optional<Date>fechaDesde,
-            @RequestParam(required = false) Optional<Date>fechaHasta,
+            @RequestParam(required = false) Optional<Date> fechaDesde,
+            @RequestParam(required = false) Optional<Date> fechaHasta,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction,
             HttpServletRequest request,
             @AuthenticationPrincipal Usuario usuarioAutenticado
-            ) {
+    ) {
         log.info("Buscando todos los pedidos con filtros");
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
 
-        Page<PedidoResponseDto> pageResult = pedidosService.findAll(usuario, estado,fechaDesde,fechaHasta ,pageable);
+        Page<PedidoResponseDto> pageResult = pedidosService.findAll(usuario, estado, fechaDesde, fechaHasta, pageable);
 
         return ResponseEntity.ok()
                 .header("link", paginationLinksUtils.createLinkHeader(pageResult, uriBuilder))
@@ -69,6 +69,7 @@ public class PedidoRestController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PedidoResponseDto> create(@Valid @RequestBody CheckoutRequestDto checkoutRequestDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
         log.info("Creando pedido desde carrito: {}", checkoutRequestDto.getCarritoId());
         var saved = pedidosService.save(checkoutRequestDto);
@@ -83,7 +84,7 @@ public class PedidoRestController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<PedidoResponseDto> updatePartial(@PathVariable Long id, @Valid @RequestBody PedidoUpdateDto pedidoUpdateDto, @AuthenticationPrincipal Usuario usuarioAutenticado) {
-        log.info("Actualizando parcialmente pedido con id={} con datos={}",id, pedidoUpdateDto);
+        log.info("Actualizando parcialmente pedido con id={} con datos={}", id, pedidoUpdateDto);
         return ResponseEntity.ok(pedidosService.update(id, pedidoUpdateDto));
     }
 
