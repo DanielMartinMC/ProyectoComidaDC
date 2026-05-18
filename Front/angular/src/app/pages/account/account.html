@@ -1,0 +1,286 @@
+<div class="bg-[#f3f5f8] min-h-screen py-4 sm:py-6">
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-5 xl:grid-cols-[320px_1fr]">
+      <aside class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-lg font-bold text-orange-600">
+            {{ getInitials() }}
+          </div>
+          <div class="min-w-0">
+            <p class="truncate text-3xl font-extrabold tracking-tight text-slate-900">{{ getDisplayName() }}</p>
+            <p class="truncate text-sm text-slate-400">{{ getDisplayEmail() }}</p>
+            <p class="mt-1 text-sm text-slate-400">Miembro desde {{ getMemberSinceLabel() }}</p>
+          </div>
+        </div>
+
+        <div class="mt-7 space-y-2.5">
+          <button
+            type="button"
+            (click)="setTab('perfil')"
+            class="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-lg font-semibold transition-all"
+            [class]="activeTab === 'perfil' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+          >
+            <span>Mi Perfil</span>
+            <span class="text-base opacity-70">›</span>
+          </button>
+          <button
+            type="button"
+            (click)="setTab('pedidos')"
+            class="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-lg font-semibold transition-all"
+            [class]="activeTab === 'pedidos' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+          >
+            <span>Mis Pedidos</span>
+            <span class="text-base opacity-70">›</span>
+          </button>
+          <button
+            type="button"
+            (click)="setTab('pagos')"
+            class="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-lg font-semibold transition-all"
+            [class]="activeTab === 'pagos' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+          >
+            <span>Métodos de Pago</span>
+            <span class="text-base opacity-70">›</span>
+          </button>
+
+          @if (userService.isAdminUser()) {
+            <button
+              type="button"
+              (click)="setTab('admin')"
+              class="group flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-lg font-semibold transition-all"
+              [class]="activeTab === 'admin' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+            >
+              <span>Panel Admin</span>
+              <span class="text-base opacity-70">›</span>
+            </button>
+          }
+        </div>
+
+        @if (!userService.isPremium()) {
+          <a
+            routerLink="/suscripcion"
+            class="mt-5 flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-3 text-lg font-bold text-white shadow-lg shadow-orange-300/40 transition-transform hover:scale-[1.01]"
+          >
+            <span>Hazte Premium</span>
+            <span class="text-base">›</span>
+          </a>
+        }
+
+        <button
+          type="button"
+          (click)="logout()"
+          class="mt-7 flex items-center gap-2 px-2 py-2 text-lg font-medium text-red-600 hover:text-red-700"
+        >
+          <span class="text-xl">↪</span>
+          <span>Cerrar Sesión</span>
+        </button>
+      </aside>
+
+      <section class="space-y-5">
+        @if (activeTab === 'perfil') {
+          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Información Personal</h2>
+                <p class="mt-1.5 text-base text-slate-500 sm:text-lg">Gestiona tus datos de contacto y dirección de entrega.</p>
+              </div>
+              @if (!isEditing) {
+                <button
+                  type="button"
+                  (click)="startEdit()"
+                  class="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  Editar
+                </button>
+              }
+            </div>
+
+            @if (!isEditing) {
+              <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div>
+                  <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Nombre completo</p>
+                  <div class="rounded-2xl bg-slate-100 px-4 py-3 text-lg text-slate-800">{{ getDisplayName() }}</div>
+                </div>
+                <div>
+                  <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Correo electrónico</p>
+                  <div class="rounded-2xl bg-slate-100 px-4 py-3 text-lg text-slate-800">{{ getDisplayEmail() }}</div>
+                </div>
+                <div>
+                  <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Teléfono</p>
+                  <div class="rounded-2xl bg-slate-100 px-4 py-3 text-lg text-slate-800">{{ usuario?.telefono || userService.user()?.phone || 'Sin teléfono' }}</div>
+                </div>
+                <div class="lg:col-span-2">
+                  <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Dirección de entrega</p>
+                  <div class="rounded-2xl bg-slate-100 px-4 py-3 text-lg text-slate-800">
+                    {{ usuario?.direccion || userService.user()?.address || 'No especificada' }}
+                    @if (usuario?.codigoPostal || userService.user()?.codigoPostal || usuario?.ciudad || userService.user()?.ciudad) {
+                      , {{ usuario?.ciudad || userService.user()?.ciudad }} {{ usuario?.codigoPostal || userService.user()?.codigoPostal }}
+                    }
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="mt-6 space-y-4">
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nombre de usuario</label>
+                    <input type="text" [value]="draft.username" (input)="updateField('username', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Correo electrónico</label>
+                    <input type="email" [value]="draft.email" (input)="updateField('email', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nombre completo</label>
+                    <input type="text" [value]="draft.name" (input)="updateField('name', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Teléfono</label>
+                    <input type="tel" [value]="draft.phone" (input)="updateField('phone', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Dirección</label>
+                  <input type="text" [value]="draft.address" (input)="updateField('address', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Código postal</label>
+                    <input type="text" [value]="draft.codigoPostal" (input)="updateField('codigoPostal', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Ciudad</label>
+                    <input type="text" [value]="draft.ciudad" (input)="updateField('ciudad', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">País</label>
+                    <input type="text" [value]="draft.pais" (input)="updateField('pais', $event)" class="w-full rounded-2xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 focus:border-orange-400 focus:outline-none" />
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-3 pt-2">
+                  <button type="button" (click)="cancelEdit()" class="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancelar</button>
+                  <button type="button" (click)="saveEdit()" class="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">Guardar cambios</button>
+                </div>
+              </div>
+            }
+          </article>
+        }
+
+        @if (activeTab === 'pedidos') {
+          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Historial de Pedidos</h2>
+            <p class="mt-1.5 text-base text-slate-500 sm:text-lg">Todos tus pedidos anteriores en un solo lugar.</p>
+
+            @if (reorderMessage) {
+              <div class="mt-4 rounded-2xl p-3 text-sm"
+                   [ngClass]="reorderMessageType === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'">
+                {{ reorderMessage }}
+              </div>
+            }
+
+            @if (userService.orders().length > 0) {
+              <div class="mt-6 space-y-3.5">
+                @for (order of userService.orders(); track order.id) {
+                  <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <p class="text-lg font-extrabold text-slate-900">{{ order.id }}</p>
+                          <span class="rounded-full border px-2.5 py-0.5 text-xs font-semibold" [ngClass]="getOrderStatusClass(order.status)">
+                            {{ order.status }}
+                          </span>
+                        </div>
+                        <p class="mt-1 text-sm text-slate-400">{{ formatOrderDate(order.date) }} · {{ order.itemCount }} {{ order.itemCount === 1 ? 'producto' : 'productos' }}</p>
+                        <ul class="mt-2 list-disc list-inside text-sm text-slate-600">
+                          @for (item of order.items; track $index) {
+                            <li>{{ item.name }} (x{{ item.quantity }})</li>
+                          }
+                        </ul>
+                      </div>
+                      <div class="sm:text-right">
+                        <p class="text-2xl font-black text-slate-900">{{ order.total | currency: 'EUR' }}</p>
+                        <button type="button" (click)="repeatOrder(order)" class="mt-2 text-sm font-semibold text-orange-500 hover:text-orange-600">
+                          Repetir pedido
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center text-sm text-slate-500">
+                No has realizado ningún pedido todavía.
+              </div>
+            }
+          </article>
+        }
+
+        @if (activeTab === 'pagos') {
+          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Métodos de Pago</h2>
+                <p class="mt-1.5 text-base text-slate-500 sm:text-lg">Administra tus tarjetas y saldo disponible.</p>
+              </div>
+              <button type="button" (click)="openAddPaymentModal()" class="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
+                Añadir método
+              </button>
+            </div>
+
+            <div class="mt-6 space-y-3.5">
+              @for (card of userService.paymentMethods(); track card.id) {
+                <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4">
+                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p class="text-lg font-extrabold text-slate-900">{{ card.tipo }} ···· {{ card.numeroTarjeta.slice(-4) }}</p>
+                      <p class="mt-0.5 text-sm text-slate-500">Expira: {{ card.fechaExpiracion }}</p>
+                      <p class="mt-0.5 text-sm text-slate-500">Saldo: {{ translateService.formatCurrency(card.saldoDisponible ?? 0) }}</p>
+                      @if (card.isDefault) {
+                        <p class="mt-1.5 inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">Predeterminada</p>
+                      }
+                    </div>
+                    <div class="flex flex-wrap gap-2.5">
+                      @if (!card.isDefault) {
+                        <button type="button" (click)="userService.setDefaultPayment(card.id)" class="rounded-full border border-slate-200 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                          Hacer predeterminada
+                        </button>
+                      }
+                      <button type="button" (click)="openEditPaymentModal(card)" class="rounded-full border border-slate-200 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                        Editar
+                      </button>
+                      <button type="button" (click)="deletePaymentMethod(card)" class="rounded-full border border-red-200 px-3.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (userService.paymentMethods().length === 0) {
+                <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center text-sm text-slate-500">
+                  No tienes métodos de pago guardados.
+                </div>
+              }
+            </div>
+          </article>
+        }
+
+        @if (activeTab === 'admin' && userService.isAdminUser()) {
+          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Panel de Administración</h2>
+            <p class="mt-1.5 text-base text-slate-500 sm:text-lg">Accede a las herramientas de gestión.</p>
+            <a routerLink="/admin" class="mt-6 inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+              Ir al panel admin
+            </a>
+          </article>
+        }
+      </section>
+    </div>
+  </main>
+</div>
+
+<app-payment-modal #paymentModal></app-payment-modal>
