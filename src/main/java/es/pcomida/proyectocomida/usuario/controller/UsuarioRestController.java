@@ -1,7 +1,9 @@
 package es.pcomida.proyectocomida.usuario.controller;
 
+import es.pcomida.proyectocomida.metodopago.services.MetodoPagoService;
 import es.pcomida.proyectocomida.usuario.dto.UsuarioResponseDTO;
 import es.pcomida.proyectocomida.usuario.dto.UsuarioUpdateDTO;
+import es.pcomida.proyectocomida.usuario.models.Usuario;
 import es.pcomida.proyectocomida.usuario.services.UsuarioService;
 import es.pcomida.proyectocomida.utils.pagination.PageResponse;
 import es.pcomida.proyectocomida.utils.pagination.PaginationLinksUtils;
@@ -13,13 +15,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import es.pcomida.proyectocomida.usuario.models.Usuario;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -28,6 +33,7 @@ import java.util.Optional;
 @RequestMapping("${api.version}/usuarios")
 public class UsuarioRestController {
     private final UsuarioService usuarioService;
+    private final MetodoPagoService metodoPagoService;
     private final PaginationLinksUtils paginationLinksUtils;
 
     @GetMapping
@@ -63,13 +69,26 @@ public class UsuarioRestController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> updateMyProfile(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
         log.info("Actualizando perfil del usuario: {}", usuario.getUsername());
+        log.info("Datos recibidos: {}", usuarioUpdateDTO);
         return ResponseEntity.ok(usuarioService.update(usuario.getId(), usuarioUpdateDTO));
     }
 
     @PostMapping("/me/suscribir")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<UsuarioResponseDTO> subscribe(@AuthenticationPrincipal Usuario usuario) {
-        log.info("Suscribiendo al usuario: {}", usuario.getUsername());
+    public ResponseEntity<UsuarioResponseDTO> subscribe(
+            @AuthenticationPrincipal Usuario usuario,
+            @RequestBody(required = false) Map<String, Long> body) {
+
+        if (body == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "metodosPagoId requerido");
+        }
+
+        Long metodosPagoId = body.get("metodosPagoId");
+        if (metodosPagoId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "metodosPagoId requerido");
+        }
+
+        metodoPagoService.cobrar(metodosPagoId, new BigDecimal("9.99"), usuario);
         return ResponseEntity.ok(usuarioService.subscribe(usuario.getId()));
     }
 

@@ -29,30 +29,26 @@ public class Carrito {
     private Estados estado;
 
     @CreationTimestamp
-    @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "fecha_creacion", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Builder.Default
-    private LocalDateTime fechaCreación = LocalDateTime.now();
+    private LocalDateTime fechaCreacion = LocalDateTime.now();
 
     @UpdateTimestamp
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Builder.Default
     private LocalDateTime fechaActualizacion = LocalDateTime.now();
 
-    // Cambiado de Float a String para guardar el código del cupón (ej: "VERANO2024")
     private String codigoCupon;
 
-    // Cambiado de Float a Double para mayor precisión en precios
-    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    @Column(nullable = false, columnDefinition = "DOUBLE PRECISION DEFAULT 0.0")
     @Builder.Default
     private Double descuento = 0.0;
 
-    // Cambiado de Float a Double
-    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    @Column(nullable = false, columnDefinition = "DOUBLE PRECISION DEFAULT 0.0")
     @Builder.Default
     private Double impuestosCalc = 0.0;
 
-    // Total calculado y persistido (opcional, pero útil para consultas rápidas)
-    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    @Column(nullable = false, columnDefinition = "DOUBLE PRECISION DEFAULT 0.0")
     @Builder.Default
     private Double total = 0.0;
 
@@ -68,25 +64,20 @@ public class Carrito {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
     private Usuario usuario;
 
-    // Método helper para recalcular totales
     public void recalcularTotales() {
         double subtotal = items.stream()
                 .mapToDouble(item -> item.getPlato().getPrecio() * item.getCantidad())
                 .sum();
 
-        // Aplicar descuento de suscriptor si el usuario lo es
         if (this.usuario != null && this.usuario.getIsSuscriptor()) {
-            subtotal *= 0.85; // Aplica un 15% de descuento
+            subtotal *= 0.85;
         }
 
-        // Aplicar descuento por cupón si existe
         if (this.descuento != null) {
             subtotal = Math.max(0.0, subtotal - this.descuento);
         }
 
         this.total = subtotal;
-        
-        // Calcular impuestos (ejemplo 10%)
-        this.impuestosCalc = this.total * 0.10; 
+        this.impuestosCalc = this.total * 0.10;
     }
 }

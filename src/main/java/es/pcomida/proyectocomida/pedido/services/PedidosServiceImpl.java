@@ -4,6 +4,9 @@ import es.pcomida.proyectocomida.carrito.exceptions.CarritoNotFoundException;
 import es.pcomida.proyectocomida.carrito.models.Carrito;
 import es.pcomida.proyectocomida.carrito.models.Estados;
 import es.pcomida.proyectocomida.carrito.repositories.CarritoRepository;
+import es.pcomida.proyectocomida.metodopago.exceptions.MetodoPagoNotFoundException;
+import es.pcomida.proyectocomida.metodopago.models.MetodoPago;
+import es.pcomida.proyectocomida.metodopago.repositories.MetodoPagoRepository;
 import es.pcomida.proyectocomida.pedido.dto.CheckoutRequestDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoResponseDto;
 import es.pcomida.proyectocomida.pedido.dto.PedidoUpdateDto;
@@ -39,6 +42,7 @@ public class PedidosServiceImpl implements PedidosService {
     private final PedidosRepository pedidosRepository;
     private final PedidoMapper pedidoMapper;
     private final CarritoRepository carritoRepository;
+    private final MetodoPagoRepository metodoPagoRepository;
 
     @Override
     public Page<PedidoResponseDto> findAll(Optional<Long> usuarioId, Optional<Estado> estado,
@@ -48,9 +52,9 @@ public class PedidosServiceImpl implements PedidosService {
 
         final Optional<Long> idUser;
         if (user.getRoles().stream().anyMatch(r -> r.name().equals("ADMIN"))) {
-            idUser = usuarioId; // Admin puede filtrar por cualquier usuario o ver todos
+            idUser = usuarioId;
         } else {
-            idUser = Optional.of(user.getId()); // User solo ve los suyos siempre
+            idUser = Optional.of(user.getId());
         }
 
         log.info("Buscando pedidos con filtros: usuarioId={}, estado={}", idUser, estado);
@@ -109,7 +113,12 @@ public class PedidosServiceImpl implements PedidosService {
             throw new IllegalStateException("El carrito está vacío, no se puede crear un pedido.");
         }
 
-        Pedido nuevoPedido = pedidoMapper.toPedido(carrito);
+        MetodoPago metodoPago = metodoPagoRepository.findByIdAndUsuarioIdAndIsDeletedFalse(
+                checkoutRequestDto.getMetodoPagoId(),
+                carrito.getUsuario().getId()
+        ).orElseThrow(() -> new MetodoPagoNotFoundException(checkoutRequestDto.getMetodoPagoId()));
+
+        Pedido nuevoPedido = pedidoMapper.toPedido(carrito, metodoPago);
         nuevoPedido.setEstado(Estado.EnProceso);
 
         carrito.setEstado(Estados.Contenido);
@@ -139,12 +148,9 @@ public class PedidosServiceImpl implements PedidosService {
                 .orElseThrow(() -> new PedidoNotFoundException(id));
         checkAdminOrOwner(pedido.getUsuario().getId());
 
-        // ✅ Soft delete real en vez de borrado físico
         pedido.setIsDeleted(true);
         pedidosRepository.save(pedido);
     }
-
-    // --- Métodos privados ---
 
     private void checkAdminOrOwner(Long ownerId) {
         Usuario user = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

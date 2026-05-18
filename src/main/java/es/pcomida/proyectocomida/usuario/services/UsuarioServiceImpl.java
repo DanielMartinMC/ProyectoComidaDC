@@ -99,14 +99,14 @@ public class UsuarioServiceImpl implements UsuarioService, InitializingBean {
         if (usuarioUpdateDTO.getEmail() != null && !usuarioActual.getEmail().equals(usuarioUpdateDTO.getEmail()) && usuarioRepository.existsByEmail(usuarioUpdateDTO.getEmail())) {
             throw new UsuarioBadRequestException("El email ya existe");
         }
-        
+
         if (usuarioUpdateDTO.getPassword() != null && !usuarioUpdateDTO.getPassword().isEmpty()) {
             usuarioUpdateDTO.setPassword(passwordEncoder.encode(usuarioUpdateDTO.getPassword()));
         }
 
         Usuario usuarioActualizado = usuarioMapper.toUsuario(usuarioUpdateDTO, usuarioActual);
         Usuario usuarioGuardado = usuarioRepository.save(usuarioActualizado);
-        
+
         return usuarioMapper.toUsuarioResponseDTO(usuarioGuardado);
     }
 

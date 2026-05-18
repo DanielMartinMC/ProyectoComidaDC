@@ -5,7 +5,9 @@ import es.pcomida.proyectocomida.usuario.models.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Builder
 @ToString
@@ -40,6 +42,10 @@ public class Pedido {
     @ManyToOne
     @JoinColumn(name = "metodo_pago_id")
     private MetodoPago metodoPago;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PedidoItem> pedidoItems = new ArrayList<>();
 
     @Builder.Default
     private Boolean isDeleted = false;

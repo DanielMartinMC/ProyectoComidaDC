@@ -37,7 +37,7 @@ public class MetodoPagoMapper {
         return MetodoPagoDto.builder()
                 .id(metodoPago.getId())
                 .tipo(metodoPago.getTipo())
-                .numeroTarjeta(metodoPago.getNumeroTarjeta()) // Idealmente, solo los últimos 4 dígitos
+                .numeroTarjeta(metodoPago.getNumeroTarjeta())
                 .fechaExpiracion(metodoPago.getFechaExpiracion())
                 .isDefault(metodoPago.getIsDefault())
                 .saldoDisponible(metodoPago.getSaldoDisponible())

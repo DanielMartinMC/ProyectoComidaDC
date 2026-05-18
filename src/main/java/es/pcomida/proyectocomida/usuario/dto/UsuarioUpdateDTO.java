@@ -1,10 +1,14 @@
 package es.pcomida.proyectocomida.usuario.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioUpdateDTO {
     private String nombre;
     private String apellidos;

@@ -29,7 +29,6 @@ public class CarritoMapper {
     }
 
     public Carrito toCarrito(CarritoUpdateDto carritoUpdateDto, Carrito carrito) {
-        // Solo permitimos actualizar el código del cupón directamente
         if (carritoUpdateDto.getCodigoCupon() != null) {
             carrito.setCodigoCupon(carritoUpdateDto.getCodigoCupon());
         }
@@ -61,7 +60,7 @@ public class CarritoMapper {
                 .subtotal(subtotal)
                 .total(carrito.getTotal())
                 .estado(carrito.getEstado())
-                .fechaCreacion(carrito.getFechaCreación())
+                .fechaCreacion(carrito.getFechaCreacion())
                 .fechaActualizacion(carrito.getFechaActualizacion())
                 .codigoCupon(carrito.getCodigoCupon())
                 .descuento(carrito.getDescuento())
