@@ -142,7 +142,7 @@ INSERT INTO PLATOS (nombre, descripcion, tipo, categoria, pais, precio, variante
         ('Kheer de Arroz',         'Pudín de arroz cocido en leche con cardamomo, azafrán, pistachos y pétalos de rosa',          'CENA',     'POSTRE',   'INDIO',     6.00, 'SIN_GLUTEN',        35, false, false),
         ('Kulfi de Pistacho',      'Helado indio denso de leche reducida con pistachos, cardamomo y agua de rosas',               'MERIENDA', 'POSTRE',   'INDIO',     6.50, 'SIN_GLUTEN',        30, false, false),
         ('Jalebi',                 'Espirales de masa fermentada fritas y bañadas en almíbar de azafrán, crujientes y dulces',    'MERIENDA', 'POSTRE',   'INDIO',     5.00, 'ESTANDAR',          35, false, false),
-        ('Rasmalai',               'Bolas de queso fresco en leche perfumada con azafrán, cardamomo y pistachos laminados',       'CENA',     'POSTRE',   'INDIO',     6.50, 'SIN_GLUTEN',        25, false, false),
+        ('Rasmalai',               'Bolas de queso fresco en leche perfumada con azafrán, cardomomo y pistachos laminados',       'CENA',     'POSTRE',   'INDIO',     6.50, 'SIN_GLUTEN',        25, false, false),
         ('Halwa de Zanahoria',     'Zanahoria rallada cocida en ghee, leche, azúcar y cardamomo, con frutos secos',               'MERIENDA', 'POSTRE',   'INDIO',     5.50, 'SIN_GLUTEN',        30, false, false),
         ('Shahi Tukda',            'Pan frito en ghee empapado en leche con azafrán y cubierto de rabri y pistachos',             'CENA',     'POSTRE',   'INDIO',     7.00, 'ESTANDAR',          20, false, false);
 
@@ -176,13 +176,12 @@ INSERT INTO PLATOS (nombre, descripcion, tipo, categoria, pais, precio, variante
 INSERT INTO METODOS_PAGO (tipo, numero_tarjeta, fecha_expiracion, is_default, usuario_id, saldo_disponible, created_at, updated_at) VALUES
                                                                                                                                         ('TARJETA_CREDITO', '************1111', '12/25', true,  1, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
                                                                                                                                         ('TARJETA_DEBITO',  '************2222', '06/26', false, 1, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-                                                                                                                                        ('PAYPAL',          'ana@paypal.com',   'N/A',   true,  2, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
                                                                                                                                         ('TARJETA_CREDITO', '************3333', '01/24', true,  3, 100.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 5. Actualizamos el usuario con su método de pago por defecto
 UPDATE USUARIOS SET default_metodo_pago_id = 1 WHERE id = 1;
-UPDATE USUARIOS SET default_metodo_pago_id = 3 WHERE id = 2;
-UPDATE USUARIOS SET default_metodo_pago_id = 4 WHERE id = 3;
+UPDATE USUARIOS SET default_metodo_pago_id = null WHERE id = 2;
+UPDATE USUARIOS SET default_metodo_pago_id = 3 WHERE id = 3;
 
 -- 6. Insertamos Carritos
 INSERT INTO CARRITOS (usuario_id, estado, codigo_cupon, descuento, impuestos_calc, total, is_deleted) VALUES
@@ -198,5 +197,5 @@ INSERT INTO CARRITO_ITEMS(carrito_id, plato_id, cantidad, precio_unitario) VALUE
 
 -- 8. Insertamos Pedidos
 INSERT INTO PEDIDOS (fecha_pedido, estado, total, usuario_id, direccion, metodo_pago_id) VALUES
-          (CURRENT_TIMESTAMP, 'Completado', 26.00, 2, 'Avenida Principal 45', 3),
-          (CURRENT_TIMESTAMP, 'EnProceso',  7.00,  3, 'Plaza Mayor 1',        4);
+          (CURRENT_TIMESTAMP, 'Completado', 26.00, 2, 'Avenida Principal 45', null),
+          (CURRENT_TIMESTAMP, 'EnProceso',  7.00,  3, 'Plaza Mayor 1',        3);

@@ -1,25 +1,25 @@
 ### Obtener todos los platos (paginado) - Sin autenticación
-GET http://localhost:3000/v1/platos?page=0&size=5&sortBy=nombre&direction=asc
+GET http://localhost:8080/v1/platos?page=0&size=5&sortBy=nombre&direction=asc
 Accept: application/json
 
 ###
-GET http://localhost:3000/v1/platos?page=0&size=10
+GET http://localhost:8080/v1/platos?page=0&size=10
 Accept: application/json
 
 ### Obtener plato por ID
-GET http://localhost:3000/v1/platos/1
+GET http://localhost:8080/v1/platos/1
 Accept: application/json
 
 ### Filtrar platos por tipo
-GET http://localhost:3000/v1/platos?tipo=ALMUERZO&page=0&size=5
+GET http://localhost:8080/v1/platos?tipo=ALMUERZO&page=0&size=5
 Accept: application/json
 
 ### Obtener platos no eliminados
-GET http://localhost:3000/v1/platos?isDeleted=false&page=0&size=10
+GET http://localhost:8080/v1/platos?isDeleted=false&page=0&size=10
 Accept: application/json
 
 ### Crear nuevo plato (requiere rol ADMIN)
-POST http://localhost:3000/v1/platos
+POST http://localhost:8080/v1/platos
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -35,7 +35,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Actualizar plato (requiere rol ADMIN)
-PUT http://localhost:3000/v1/platos/1
+PUT http://localhost:8080/v1/platos/1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -45,5 +45,5 @@ Authorization: Bearer {{token}}
 }
 
 ### Eliminar plato (requiere rol ADMIN)
-DELETE http://localhost:3000/v1/platos/1
+DELETE http://localhost:8080/v1/platos/1
 Authorization: Bearer {{token}}

@@ -41,7 +41,7 @@ public class TransaccionPago {
     private EstadoPago status;
 
     @Column(columnDefinition = "TEXT")
-    private String paymentDetails; // Para IDs de transacciones externas (Stripe, PayPal)
+    private String paymentDetails; // Para IDs de transacciones externas (Stripe)
 
     private LocalDateTime confirmationDate;
 }

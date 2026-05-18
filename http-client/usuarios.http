@@ -1,9 +1,9 @@
 ### LOGIN - Obtener Token JWT (usuario admin)
-POST http://localhost:3000/v1/auth/signin
+POST http://localhost:8080/v1/auth/signin
 Content-Type: application/json
 
 {
-  "username": "admin",
+  "username": "carlos",
   "password": "password123456"
 }
 
@@ -11,28 +11,28 @@ Content-Type: application/json
 
 ###
 ### Obtener todos los usuarios (paginado) - Requiere token JWT
-GET http://localhost:3000/v1/usuarios?page=0&size=5&sortBy=username&direction=asc
+GET http://localhost:8080/v1/usuarios?page=0&size=5&sortBy=username&direction=asc
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ###
 ### Obtener todos los usuarios - Otro formato
-GET http://localhost:3000/v1/usuarios?page=0&size=10
+GET http://localhost:8080/v1/usuarios?page=0&size=10
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Obtener usuario por ID
-GET http://localhost:3000/v1/usuarios/1
+GET http://localhost:8080/v1/usuarios/1
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Obtener mi perfil (usuario autenticado)
-GET http://localhost:3000/v1/usuarios/me
+GET http://localhost:8080/v1/usuarios/me
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Actualizar mi perfil
-PUT http://localhost:3000/v1/usuarios/me
+PUT http://localhost:8080/v1/usuarios/me
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -43,7 +43,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Actualizar usuario (requiere rol ADMIN)
-PUT http://localhost:3000/v1/usuarios/1
+PUT http://localhost:8080/v1/usuarios/1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -53,7 +53,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Eliminar usuario
-DELETE http://localhost:3000/v1/usuarios/1
+DELETE http://localhost:8080/v1/usuarios/1
 Authorization: Bearer {{token}}
 
 
